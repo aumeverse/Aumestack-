@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AUMESTACK - Launch Better, Faster</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  <style>
+    /* Midnight Theme Color Palette and Font Definitions */
+    :root {
+      --background-dark: #0D1B2A; /* Deep navy background */
+      --background-section: #1B263B; /* Subtle shade for section contrast */
+      --text-light: #F5F5F5; /* Clean light grey for primary text */
+      --text-soft: #EAEAEA; /* Soft white for headings */
+      --accent-aqua: #00A8E8; /* Aqua blue for accents */
+      --link-color: #E0E1DD; /* Platinum silver for links */
+      --border-dark: #2B3A50;
+      --shadow-subtle: rgba(0, 0, 0, 0.3);
+      --sunburst-center: #1a324d; /* Lighter blue for sunburst center */
+    }
+
+    /* Basic Resets & Global Styles */
+    html {
+      scroll-behavior: smooth;
+    }
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at 50% 50%, var(--sunburst-center) 0%, var(--background-dark) 80%);
+      color: var(--text-light);
+      min-width: 0;
+      line-height: 1.6;
+    }
+    
+    /* Custom Loader Styles */
+    #intro-logo-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: var(--background-dark);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        animation: fadeOut 2s ease-in-out forwards;
+    }
+    #intro-logo-loader img {
+        max-width: 180px;
+    }
+    @keyframes fadeOut {
+        0% { opacity: 1; visibility: visible; }
+        90% { opacity: 1; visibility: visible; }
+        100% { opacity: 0; visibility: hidden; }
+    }
+
+    /* Header Section */
+    header {
+      text-align: center;
+      padding-top: 50px;
+      padding-bottom: 80px;
+    }
+    .brand-logo-main {
+      display: block;
+      margin: 0 auto 20px;
+      height: 80px; /* Adjusted height for better visibility */
+      max-width: 100%;
+    }
+    .brand-name {
+      font-family: 'Inter', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: var(--text-soft);
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+    .tagline {
+      font-size: 1.2rem;
+      color: var(--text-light);
+      max-width: 600px;
+      margin: 0 auto;
+      font-weight: 300;
+    }
+
+    /* Navigation Bar (Initially below header, becomes sticky on scroll) */
+    .header-nav {
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+      padding: 20px 0;
+      border-top: 1px solid var(--border-dark);
+      border-bottom: 1px solid var(--border-dark);
+      transition: all 0.3s ease-in-out;
+    }
+    .header-nav.sticky {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        margin-top: 0;
+        padding: 15px 0;
+        background: rgba(13, 27, 42, 0.8);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        z-index: 1000;
+    }
+    .header-nav ul {
+      list-style: none;
+      display: flex;
+      gap: 30px;
+      padding: 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .header-nav ul li a {
+      text-decoration: none;
+      font-weight: 500;
+      color: var(--text-light);
+      font-size: 1rem;
+      padding: 8px 12px;
+      transition: 0.3s;
+      white-space: nowrap;
+      position: relative;
+    }
+    .header-nav ul li a:hover {
+      color: var(--accent-aqua);
+    }
+    .header-nav ul li a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -5px;
+      left: 0;
+      background-color: var(--accent-aqua);
+      transition: width 0.3s ease-in-out;
+    }
+    .header-nav ul li a:hover::after {
+      width: 100%;
+    }
+    
+    /* General Section Styling */
+    section {
+      width: 100%;
+      max-width: 1100px;
+      margin: 100px auto;
+      padding: 60px;
+      border-radius: 8px;
+      background: var(--background-section);
+      box-shadow: 0 4px 15px var(--shadow-subtle);
+      transition: 0.4s transform, 0.4s box-shadow;
+      border: 1px solid var(--border-dark);
+    }
+    section:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    }
+    h2 {
+      font-size: 2.5rem;
+      color: var(--text-soft);
+      margin-bottom: 25px;
+      text-align: center;
+      font-weight: 700;
+    }
+    p {
+      font-size: 1rem;
+      color: var(--text-light);
+      margin-bottom: 20px;
+      line-height: 1.8;
+    }
+    
+    /* Profile Section */
+    .profile-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(13, 27, 42, 0.85); /* Darker background with transparency */
+      border-radius: 8px;
+      max-width: 700px;
+      margin: 0 auto;
+      box-shadow: none;
+      padding: 40px;
+      transition: box-shadow 0.3s;
+      border: 1px solid var(--border-dark);
+    }
+    .profile-card:hover {
+      box-shadow: 0 4px 15px var(--shadow-subtle);
+    }
+    
+    /* Updated Profile Image Placeholder */
+    .profile-img-placeholder {
+      width: 140px;
+      height: 140px;
+      background-color: var(--background-dark);
+      border: 3px solid var(--accent-aqua);
+      border-radius: 12px; /* Rectangular with rounded borders */
+      margin-bottom: 25px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .profile-info {
+        text-align: center; /* Ensures content is centered on mobile */
+    }
+    .profile-name {
+      font-size: 1.8rem;
+      color: var(--text-soft);
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .profile-role {
+      color: var(--link-color);
+      font-size: 1.1rem;
+      font-weight: 400;
+      margin-bottom: 20px;
+    }
+    .profile-bio {
+      font-size: 1rem;
+      color: var(--text-light);
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    /* Features Section */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      width: 100%;
+    }
+    .feature {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      background: rgba(13, 27, 42, 0.85); /* Darker background with transparency */
+      padding: 30px;
+      border-radius: 8px;
+      transition: 0.3s;
+      border: 1px solid var(--border-dark);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .feature i {
+      font-size: 2.5rem;
+      color: var(--accent-aqua);
+      margin-bottom: 20px;
+    }
+    .feature h3 {
+      font-size: 1.4rem;
+      color: var(--text-soft);
+      margin: 0 0 10px 0;
+      font-weight: 600;
+    }
+    .feature p {
+      margin-bottom: 0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .feature:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      border-color: var(--accent-aqua);
+    }
+
+    /* Button Styling */
+    .btn {
+      padding: 14px 30px;
+      font-size: 1.1rem;
+      border: 1px solid var(--accent-aqua);
+      border-radius: 6px;
+      background: rgba(13, 27, 42, 0.85); /* Darker background with transparency */
+      color: var(--accent-aqua);
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn:hover {
+      background: var(--accent-aqua);
+      color: var(--background-dark);
+      transform: scale(1.02);
+      box-shadow: 0 4px 15px rgba(0, 168, 232, 0.4);
+    }
+    .btn.filled {
+        background: var(--accent-aqua);
+        color: var(--background-dark);
+    }
+    .btn.filled:hover {
+        background: rgba(13, 27, 42, 0.85);
+        color: var(--accent-aqua);
+        border-color: var(--accent-aqua);
+    }
+    
+    /* Footer Section */
+    footer {
+      text-align: center;
+      padding: 60px 20px;
+      margin-top: 100px;
+      background: var(--background-section);
+      color: var(--link-color);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border-dark);
+    }
+    footer p {
+      margin-bottom: 8px;
+      color: var(--link-color);
+    }
+    footer a {
+      color: var(--text-soft);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    footer a:hover {
+      color: var(--accent-aqua);
+      text-decoration: underline;
+    }
+    
+    /* Media Queries for Responsiveness */
+    @media (max-width: 768px) {
+      .profile-card {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
+      .profile-img-placeholder {
+        margin-bottom: 25px;
+        margin-right: 0;
+      }
+      .profile-info {
+        text-align: center;
+      }
+    }
+    @media (max-width: 600px) {
+      .brand-name {
+        font-size: 2.5rem;
+      }
+      .tagline {
+        font-size: 1rem;
+      }
+      section {
+        padding: 30px 20px;
+        margin: 60px auto;
+      }
+      h2 {
+        font-size: 1.8rem;
+      }
+      .profile-img-placeholder {
+        width: 100px;
+        height: 100px;
+      }
+      .profile-name {
+        font-size: 1.4rem;
+      }
+      .profile-role {
+        font-size: 1rem;
+      }
+      .profile-bio {
+        font-size: 0.95rem;
+      }
+      .btn {
+        padding: 12px 25px;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="intro-logo-loader">
+    <img src="https://res.cloudinary.com/drghzgzt2/image/upload/v1754164829/file_0000000077ec61f79266f814e9b1f614_t67j8i.png" alt="AumeStack Logo" />
+  </div>
+
+  <header id="home" data-aos="fade-down">
+    <img src="https://res.cloudinary.com/drghzgzt2/image/upload/v1754164602/file_00000000fb1062308e7eed1e3a2a81d8_iaabpo.png" alt="AumeStack Brand Logo" class="brand-logo-main" />
+    <div class="brand-name">AUMESTACK</div>
+    <p class="tagline">We help you launch better and faster. Accelerate your business growth with cutting-edge strategy built for today’s market.</p>
+  </header>
+
+  <nav class="header-nav" id="sticky-nav">
+    <ul>
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#contact">Contact Us</a></li>
+    </ul>
+  </nav>
+
+  <section id="about" data-aos="fade-up">
+    <h2>About AumeStack</h2>
+    <p>
+      AumeStack is your go-to growth partner — we specialize in scaling existing businesses by aligning them with the latest market trends, consumer behavior, and digital innovation. Our strategies aren’t just smart; they’re built to perform.
+    </p>
+    <p>
+      We also help new-age startups and fresh product ideas successfully launch into the market with clarity, confidence, and the right tactical edge. From branding and positioning to launch execution, we bring the entire stack your business needs to thrive.
+    </p>
+    <p>
+      Whether you're scaling or starting, AumeStack ensures you’re not just part of the market — you stand out in it.
+    </p>
+  </section>
+
+  <section id="services" data-aos="fade-up">
+    <h2>What We Bring To The Table</h2>
+    <div class="features">
+      <div class="feature" data-aos="fade-right">
+        <i class="fas fa-chart-line"></i>
+        <div>
+          <h3>Growth Marketing Toolkit</h3>
+          <p>Accelerate your brand using proven trend-driven strategies and powerful execution tools.</p>
+        </div>
+      </div>
+      <div class="feature" data-aos="fade-up">
+        <i class="fas fa-lightbulb"></i>
+        <div>
+          <h3>Actionable Strategy</h3>
+          <p>Well-defined plans and fast-paced execution frameworks to adapt quickly.</p>
+        </div>
+      </div>
+      <div class="feature" data-aos="fade-left">
+        <i class="fas fa-wrench"></i>
+        <div>
+          <h3>Execution Support</h3>
+          <p>From MVPs to validation — we support you across launch lanes with minimal risk.</p>
+        </div>
+      </div>
+      <div class="feature" data-aos="fade-right">
+        <i class="fas fa-rocket"></i>
+        <div>
+          <h3>Launch Framework</h3>
+          <p>Battle-tested frameworks to help you go from 0 → 1 with clarity and confidence.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="profile" data-aos="zoom-in">
+    <h2>Meet the Founder</h2>
+    <div class="profile-card">
+        <div class="profile-img-placeholder"></div>
+      <div class="profile-info">
+        <div class="profile-name">Abhi</div>
+        <div class="profile-role">Product Manager & AI Generalist</div>
+        <div class="profile-bio">
+          I'm Abhi — a Product Manager and AI Generalist with years of experience working with startups and businesses to launch and scale products in the market. I've helped multiple ventures grow by aligning their vision with market trends and leveraging cutting-edge technology for real, measurable impact.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" data-aos="fade-up" style="text-align:center;">
+    <h2>Let's Get Started</h2>
+    <p>Ready to launch better and faster? Schedule a call with us today.</p>
+    <div class="contact-cta">
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSdtummVfIpXnp-EtJxD2htwqF7XfC_7T5BJaviGojSYzZUqJg/viewform?usp=header" class="btn filled" target="_blank">Get in Touch</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 AUMESTACK. All rights reserved.</p>
+    <p>For any queries contact: <a href="mailto:infoaume.in@gmail.com">infoaume.in@gmail.com</a></p>
+  </footer>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    // Initialize AOS library for scroll animations
+    AOS.init({ once: true, duration: 1000, easing: 'ease-in-out' });
+
+    // Sticky Navigation Bar logic
+    const navbar = document.getElementById('sticky-nav');
+    const stickyOffset = navbar.offsetTop; // Get the initial position of the navbar
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > stickyOffset) {
+            navbar.classList.add('sticky');
+        } else {
+            navbar.classList.remove('sticky');
+        }
+    });
+  </script>
+</body>
+</html>
