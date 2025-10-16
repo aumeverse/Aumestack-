@@ -1,974 +1,1368 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AUMESTACK - Launch Better, Faster</title>
-    <!-- Updated font links to include Varela Round for headings -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
-    <style>
-        /* Midnight Theme Color Palette and Font Definitions */
-        :root {
-            --background-dark: #0D1B2A;
-            --background-section: #1B263B;
-            --text-light: #F5F5F5;
-            --text-soft: #FFFFFF;
-            --accent-aqua: #1AFFFF;
-            --link-color: #E0E1DD;
-            --border-dark: #2B3A50;
-            --shadow-subtle: rgba(0, 0, 0, 0.3);
-            --sunburst-center: #1a324d;
-        }
-        /* Basic Resets & Global Styles */
-        html {
-            scroll-behavior: smooth;
-        }
-        html, body {
-            width: 100%;
-            overflow-x: hidden;
-            perspective: 1000px;
-        }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            /* Changed body background to be semi-transparent to show the canvas */
-            background-color: rgba(13, 27, 42, 0.95);
-            color: var(--text-light);
-            min-width: 0;
-            line-height: 1.6;
-        }
-        #futuristic-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            /* Changed z-index to a negative value to keep it behind all content */
-            z-index: -1;
-        }
-        #intro-logo-loader {
-            display: none;
-        }
-        .nav-toggle {
-            position: fixed;
-            top: 30px;
-            right: 30px;
-            z-index: 2000;
-            width: 40px;
-            height: 40px;
-            background: rgba(16, 30, 46, 0.4);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-dark);
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.3s ease-in-out;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-        .nav-toggle .fas {
-            font-size: 1.5rem;
-            color: var(--accent-aqua);
-        }
-        .fullscreen-nav {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 100%;
-            height: 100vh;
-            z-index: 1500;
-            background: rgba(13, 27, 42, 0.95);
-            backdrop-filter: blur(10px);
-            transform: translateX(100%);
-            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .fullscreen-nav.active {
-            transform: translateX(0);
-        }
-        .fullscreen-nav ul {
-            list-style: none;
-            padding: 0;
-            text-align: center;
-        }
-        .fullscreen-nav ul li a {
-            font-family: 'Varela Round', sans-serif;
-            text-decoration: none;
-            color: var(--text-light);
-            font-size: 2rem;
-            font-weight: 700;
-            display: block;
-            padding: 20px 0;
-            transition: color 0.3s ease;
-        }
-        .fullscreen-nav ul li a:hover {
-            color: var(--accent-aqua);
-        }
-        header {
-            text-align: center;
-            padding-top: 50px;
-            padding-bottom: 80px;
-        }
-        .brand-logo-main {
-            display: block;
-            margin: 0 auto 20px;
-            /* Increased logo size from 120px to 150px */
-            height: 150px;
-            max-width: 100%;
-            animation: spin 5s linear infinite;
-        }
-        .brand-name {
-            font-family: 'Varela Round', sans-serif;
-            font-size: 3.5rem;
-            font-weight: 700;
-            color: var(--text-soft);
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        section {
-            width: 100%;
-            max-width: 1100px;
-            margin: 100px auto;
-            padding: 60px;
-            border-radius: 8px;
-            background: rgba(16, 30, 46, 0.2);
-            backdrop-filter: blur(2px);
-            box-shadow: 0 4px 15px var(--shadow-subtle);
-            transition: transform 0.6s ease-in-out, box-shadow 0.6s ease-in-out;
-            border: 1px solid var(--border-dark);
-            transform: translate3d(0, -5px, 0);
-        }
-        section:hover {
-            transform: translate3d(0, -10px, 50px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-        }
-        h2 {
-            font-family: 'Varela Round', sans-serif;
-            font-size: 2.5rem;
-            color: var(--text-soft);
-            margin-bottom: 25px;
-            text-align: center;
-            font-weight: 700;
-        }
-        h3 {
-            font-family: 'Varela Round', sans-serif;
-            font-size: 1.4rem;
-            color: var(--text-soft);
-            margin: 0 0 10px 0;
-            font-weight: 600;
-        }
-        p {
-            font-size: 1rem;
-            color: var(--text-light);
-            margin-bottom: 20px;
-            line-height: 1.8;
-            font-weight: 700;
-            font-family: 'Varela Round', sans-serif;
-        }
-        .heading-container {
-            display: flex;
-            justify-content: center;
-            overflow: hidden;
-            margin-bottom: 25px;
-        }
-        .heading-container span {
-            display: inline-block;
-            font-family: 'Varela Round', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text-soft);
-            white-space: nowrap;
-        }
-        .heading-container .about-text {
-            text-align: right;
-            padding-right: 10px;
-        }
-        .heading-container .aumestack-text {
-            text-align: left;
-            padding-left: 10px;
-        }
-        .dynamic-headline-container {
-            text-align: center;
-            padding: 50px 20px;
-            margin-bottom: 50px;
-            margin-top: -50px;
-        }
-        .dynamic-headline-container h2 {
-            font-family: 'Varela Round', sans-serif;
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--text-soft);
-            margin: 0;
-            line-height: 1.2;
-        }
-        .dynamic-text-wrapper {
-            display: inline-block;
-            white-space: nowrap;
-        }
-        .dynamic-text-wrapper .static {
-            color: var(--text-soft);
-        }
-        .dynamic-text-wrapper .dynamic {
-            color: var(--accent-aqua);
-        }
-        #new-tagline span {
-            display: inline-block;
-            color: var(--text-soft);
-        }
-        #new-tagline .highlight {
-            color: var(--accent-aqua);
-        }
-        .contact-image {
-            width: 100%;
-            max-width: 400px;
-            display: block;
-            margin: 20px auto;
-        }
-        .contact-form-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 50px;
-        }
-        .contact-form-container h2 {
-            font-size: 3rem;
-            text-align: left;
-            margin: 0;
-            line-height: 1.2;
-        }
-        .contact-form {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .form-group label {
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-            color: var(--text-light);
-        }
-        .form-group input, .form-group textarea {
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px solid var(--border-dark);
-            background: rgba(16, 30, 46, 0.5);
-            color: var(--text-light);
-            font-family: 'Inter', sans-serif;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-        .form-group input:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: var(--accent-aqua);
-            box-shadow: 0 0 5px rgba(26, 255, 255, 0.5);
-        }
-        .btn.filled {
-            font-weight: 700;
-        }
-        footer {
-            text-align: center;
-            padding: 60px 20px;
-            margin-top: 100px;
-            background: var(--background-section);
-            color: var(--link-color);
-            font-size: 0.9rem;
-            border-top: 1px solid var(--border-dark);
-        }
-        footer p {
-            margin-bottom: 8px;
-            color: var(--link-color);
-        }
-        footer a {
-            color: var(--text-soft);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-        footer a:hover {
-            color: var(--accent-aqua);
-            text-decoration: underline;
-        }
-        .service-section-container {
-            text-align: center;
-            margin: 100px auto;
-            max-width: 1100px;
-        }
-        .service-section-container h2 {
-            margin-bottom: 50px;
-        }
-        .service-card {
-            width: 100%;
-            max-width: 1100px;
-            margin: 60px auto;
-            padding: 40px;
-            border-radius: 8px;
-            background: rgba(16, 30, 46, 0.2);
-            backdrop-filter: blur(2px);
-            box-shadow: 0 4px 15px var(--shadow-subtle);
-            transition: transform 0.6s ease-in-out, box-shadow 0.6s ease-in-out;
-            border: 1px solid var(--border-dark);
-            transform: translate3d(0, -5px, 0);
-            text-align: center;
-        }
-        .service-card:hover {
-            transform: translate3d(0, -10px, 50px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-        }
-        .service-card i {
-            font-size: 3rem;
-            color: var(--accent-aqua);
-            margin-bottom: 20px;
-        }
-        /* Style for the new message box */
-        .message-box {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #2b3a50;
-            color: var(--text-light);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            z-index: 2500;
-            text-align: center;
-            border: 1px solid var(--accent-aqua);
-            display: none;
-        }
-        .message-box.visible {
-            display: block;
-        }
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import {
+	Menu, X, Zap, Cpu, Shield, Clock, Rocket, Target, 
+	MessageCircle, TrendingUp, BarChart, Funnel, Settings, Lightbulb,
+	FileText, CheckSquare, Code, Phone, Mail, MapPin, Linkedin, Instagram,
+	ChevronDown, Bot, Users, Activity, Layers, Minus, Aperture
+} from 'lucide-react';
 
-        /* --- Mobile-specific styles (max-width: 768px) --- */
-        @media (max-width: 768px) {
-            header {
-                padding: 30px 20px 50px;
-            }
-            .brand-logo-main {
-                height: 120px; /* Adjusted logo size for better mobile fit */
-            }
-            .brand-name {
-                font-size: 2.5rem;
-            }
-            .tagline {
-                font-size: 0.9rem;
-            }
-            section {
-                padding: 40px 20px;
-                margin: 50px auto;
-            }
-            .profile-card {
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                text-align: center;
-            }
-            .profile-img-placeholder {
-                margin-bottom: 25px;
-                margin-right: 0;
-            }
-            .profile-info {
-                text-align: center;
-            }
-            .heading-container span {
-                font-size: 2rem;
-            }
-            .contact-form-container {
-                flex-direction: column;
-                gap: 30px;
-            }
-            .contact-form-container h2 {
-                text-align: center;
-            }
-            .service-card {
-                padding: 30px 20px;
-            }
-            .dynamic-headline-container h2 {
-                font-size: 2.5rem;
-            }
-        }
-        
-        /* --- Smaller mobile view (max-width: 600px) --- */
-        @media (max-width: 600px) {
-            .brand-name {
-                font-size: 2rem;
-            }
-            .tagline {
-                font-size: 0.8rem;
-            }
-            .dynamic-headline-container h2 {
-                font-size: 1.8rem;
-            }
-            section {
-                padding: 30px 15px;
-                margin: 40px auto;
-            }
-            h2 {
-                font-size: 1.8rem;
-            }
-            h3 {
-                font-size: 1.2rem;
-            }
-            .profile-img-placeholder {
-                width: 100px;
-                height: 100px;
-            }
-            .profile-name {
-                font-size: 1.4rem;
-            }
-            .profile-role {
-                font-size: 1rem;
-            }
-            .profile-bio {
-                font-size: 0.95rem;
-            }
-            .btn {
-                padding: 12px 25px;
-                font-size: 1rem;
-            }
-        }
-    </style>
-</head>
-<body>
+// --- Global Constants ---
+const LOGO_URL = "https://i.ibb.co/FbzX3729/final-logo-02.png";
+const FOOTER_BG_LOGO_URL = "https://i.ibb.co/nsRSRbTF/final-logo-06.png";
+const FALLBACK_LOGO_URL = "https://placehold.co/128x128/181827/0EA5E9?text=AumeStack";
 
-    <!-- The new canvas element for the animated background -->
-    <canvas id="futuristic-canvas"></canvas>
-    
-    <div class="nav-toggle" id="nav-toggle">
-        <i class="fas fa-bars"></i>
-    </div>
-    
-    <nav class="fullscreen-nav" id="fullscreen-nav">
-        <ul>
-            <li><a href="#home">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#services-intro">Services</a></li>
-            <li><a href="#contact">Contact Us</a></li>
-        </ul>
-    </nav>
-    
-    <header id="home">
-        <img src="https://i.ibb.co/C3QZb06j/final-logo-02.png" alt="AumeStack Brand Logo" class="brand-logo-main" />
-        <div class="brand-name">AUMESTACK</div>
-        <p class="tagline">We help you launch better and faster. Accelerate your business growth with cutting-edge strategy built for today’s market.</p>
-    </header>
+const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    e.currentTarget.onerror = null; // prevents infinite loop
+    e.currentTarget.src = FALLBACK_LOGO_URL;
+};
 
-    <div class="dynamic-headline-container">
-        <h2>
-            <span class="static">We </span><span class="dynamic-text-wrapper"><span class="dynamic" id="typewriter"></span></span>
-        </h2>
-    </div>
+// --- 1. Custom Tailwind Classes & SCROLLBAR STYLING (Softened Colors) ---
+const customStyles = `
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+	width: 8px;
+}
+::-webkit-webkit-scrollbar-track {
+	background: #0F172A;
+}
+::-webkit-scrollbar-thumb {
+	background: linear-gradient(180deg, #0EA5E9, #06B6D4);
+	border-radius: 4px;
+}
 
-    <section id="about">
-        <h2>About AumeStack</h2>
-        <p>
-            AumeStack is your go-to growth partner — we specialize in scaling existing businesses by aligning them with the latest market trends, consumer behavior, and digital innovation. Our strategies aren’t just smart; they’re built to perform.
-        </p>
-        <p>
-            We also help new-age startups and fresh product ideas successfully launch into the market with clarity, confidence, and the right tactical edge. From branding and positioning to launch execution, we bring the entire stack your business needs to thrive.
-        </p>
-        <p>
-            Whether you're scaling or starting, AumeStack ensures you’re not just part of the market — you stand out in it.
-        </p>
-    </section>
-    
-    <!-- This is the new container for the services sections -->
-    <div class="service-section-container" id="services-intro">
-        <h2>What We Bring To The Table</h2>
-    </div>
+/* Custom utility class definitions */
+.gradient-text-blue {
+	background-image: linear-gradient(to right, #06B6D4, #0EA5E9, #06B6D4);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	text-fill-color: transparent;
+}
+.premium-button-blue {
+	position: relative;
+	padding: 1rem 2rem;
+	/* Softened gradient for classier look */
+	background-image: linear-gradient(to right, #1E3A8A, #254F9D, #06B6D4);
+	border-radius: 0.75rem;
+	font-weight: 600;
+	color: white;
+	overflow: hidden;
+	transition: all 0.3s ease-in-out;
+	/* Reduced glow intensity */
+	box-shadow: 0 0 10px rgba(14, 165, 233, 0.2), 0 0 20px rgba(6, 182, 212, 0.1);
+}
+.premium-button-blue:hover {
+	/* Reduced hover glow intensity */
+	box-shadow: 0 0 20px rgba(14, 165, 233, 0.4), 0 0 40px rgba(6, 182, 212, 0.2);
+	transform: scale(1.02);
+}
+.tech-card-blue {
+	/* Kept opacity/blur for clean, modern look */
+	background-color: rgba(30, 41, 59, 0.5); /* slate-800/50 */
+	backdrop-filter: blur(8px);
+	border: 1px solid rgba(51, 65, 85, 0.5); /* slate-700/50 */
+	border-radius: 1rem;
+	transition: all 0.3s ease-in-out;
+}
+.tech-card-blue:hover {
+	border-color: rgba(6, 182, 212, 0.5); /* cyan-500/50 */
+	box-shadow: 0 8px 30px rgba(14, 165, 233, 0.2); /* Reduced hover shadow */
+	transform: translateY(-4px);
+}
+.glow-effect-blue {
+	/* Reduced overall glow intensity */
+	box-shadow: 0 0 15px rgba(6, 182, 212, 0.3), 0 0 30px rgba(14, 165, 233, 0.1);
+}
+`;
 
-    <!-- Individual service sections -->
-    <section id="growth-marketing" class="service-card">
-        <i class="fas fa-chart-line"></i>
-        <h3>Growth Marketing Toolkit</h3>
-        <p>Accelerate your brand using proven trend-driven strategies and powerful execution tools.</p>
-    </section>
+// --- 2. WhatsApp Integration Functions (Kept for optional direct chat) ---
+const openWhatsAppDiscovery = () => {
+	const message = encodeURIComponent("Hi! I want to book a free discovery call for my business automation needs.");
+	window.open(`https://wa.me/919372998318?text=${message}`, '_blank');
+};
 
-    <section id="actionable-strategy" class="service-card">
-        <i class="fas fa-lightbulb"></i>
-        <h3>Actionable Strategy</h3>
-        <p>Well-defined plans and fast-paced execution frameworks to adapt quickly.</p>
-    </section>
+const openWhatsAppChat = () => {
+	window.open('https://wa.me/919372998318', '_blank');
+};
 
-    <section id="execution-support" class="service-card">
-        <i class="fas fa-wrench"></i>
-        <h3>Execution Support</h3>
-        <p>From MVPs to validation — we support you across launch lanes with minimal risk.</p>
-    </section>
+const scrollToSection = (id: string) => {
+	const element = document.getElementById(id);
+	if (element) {
+		element.scrollIntoView({ behavior: 'smooth' });
+	}
+};
 
-    <section id="launch-framework" class="service-card">
-        <i class="fas fa-rocket"></i>
-        <h3>Launch Framework</h3>
-        <p>Battle-tested frameworks to help you go from 0 → 1 with clarity and confidence.</p>
-    </section>
+// --- 3. Neural Network Background Component ---
+const NeuralNetworkBackground: React.FC = () => {
+	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+	const particlesRef = useRef<Particle[]>([]);
+	const animationFrameRef = useRef<number>();
 
-    <section id="content-development" class="service-card">
-        <i class="fas fa-pen-nib"></i>
-        <h3>Content Development Suite</h3>
-        <p>Create standout communications that attract and engage your target audience.</p>
-    </section>
+	const REPULSION_RADIUS = 200; 
+	const REPULSION_FORCE = 0.05; 
+	const PARTICLE_SPEED_MULTIPLIER = 10; 
 
-    <section id="analytics" class="service-card">
-        <i class="fas fa-chart-pie"></i>
-        <h3>Analytics & Performance Tracking</h3>
-        <p>Reassure your team with data-driven expertise and measurable ROI on all initiatives.</p>
-    </section>
+	const COLORS = {
+		PARTICLE: '#0EA5E9', 
+		LINE: '#06B6D4', 
+		BACKGROUND: '#0a0a0f', 
+	};
 
-    <!-- New tagline section -->
-    <section id="tagline-section">
-        <h2 id="new-tagline">Solving tomorrow’s business puzzles, fuelled by bold thinking, smart solutions</h2>
-    </section>
+	class Particle {
+		x: number;
+		y: number;
+		vx: number;
+		vy: number;
+		radius: number;
+		alpha: number;
 
-    <section id="profile">
-        <h2>Meet the Founder</h2>
-        <div class="profile-card">
-            <div class="profile-info">
-                <div class="profile-name">Abhishek</div>
-                <div class="profile-role">Product Manager & AI Generalist</div>
-                <div class="profile-bio">
-                    I'm Abhishek — a Product Manager and AI Generalist with years of experience working with startups and businesses to launch and scale products in the market. I've helped multiple ventures grow by aligning their vision with market trends and leveraging cutting-edge technology for real, measurable impact.
+		constructor(width: number, height: number) {
+			this.x = Math.random() * width;
+			this.y = Math.random() * height;
+			this.vx = (Math.random() - 0.5) * 0.5;
+			this.vy = (Math.random() - 0.5) * 0.5;
+			this.radius = 1 + Math.random();
+			this.alpha = 0.5 + Math.random() * 0.5;
+		}
+
+		update(ctx: CanvasRenderingContext2D, width: number, height: number, mouseX: number, mouseY: number) {
+			this.x += this.vx;
+			this.y += this.vy;
+
+			if (this.x < 0) this.x = width;
+			if (this.x > width) this.x = 0;
+			if (this.y < 0) this.y = height;
+			if (this.y > height) this.y = 0;
+
+			const dx = this.x - mouseX;
+			const dy = this.y - mouseY;
+			const dist = Math.sqrt(dx * dx + dy * dy);
+
+			if (dist < REPULSION_RADIUS) {
+				const angle = Math.atan2(dy, dx);
+				const force = (REPULSION_RADIUS - dist) / REPULSION_RADIUS * REPULSION_FORCE;
+				this.x += Math.cos(angle) * force * PARTICLE_SPEED_MULTIPLIER;
+				this.y += Math.sin(angle) * force * PARTICLE_SPEED_MULTIPLIER;
+			} else {
+				this.vx += ( (Math.random() - 0.5) * 0.05 - this.vx) * 0.1;
+				this.vy += ( (Math.random() - 0.5) * 0.05 - this.vy) * 0.1;
+			}
+
+			ctx.beginPath();
+			ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+			ctx.fillStyle = COLORS.PARTICLE;
+			ctx.globalAlpha = this.alpha;
+			ctx.fill();
+		}
+	}
+
+	const draw = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
+		ctx.fillStyle = COLORS.BACKGROUND;
+		ctx.fillRect(0, 0, width, height);
+
+		const particles = particlesRef.current;
+		const { x: mouseX, y: mouseY } = mousePos;
+
+		for (let i = 0; i < particles.length; i++) {
+			particles[i].update(ctx, width, height, mouseX, mouseY);
+			
+			for (let j = i + 1; j < particles.length; j++) {
+				const p1 = particles[i];
+				const p2 = particles[j];
+
+				const dx = p1.x - p2.x;
+				const dy = p1.y - p2.y;
+				const dist = Math.sqrt(dx * dx + dy * dy);
+
+				if (dist < 180) { 
+					ctx.beginPath();
+					ctx.strokeStyle = COLORS.LINE;
+					ctx.globalAlpha = 0.8 * (1 - dist / 180); 
+					ctx.lineWidth = 0.5;
+					ctx.moveTo(p1.x, p1.y);
+					ctx.lineTo(p2.x, p2.y);
+					ctx.stroke();
+				}
+			}
+		}
+		for (let i = 0; i < particles.length; i++) {
+			const p = particles[i];
+			const dx = p.x - mouseX;
+			const dy = p.y - mouseY;
+			const dist = Math.sqrt(dx * dx + dy * dy);
+
+			if (dist < 150) {
+				ctx.beginPath();
+				ctx.strokeStyle = COLORS.LINE;
+				ctx.globalAlpha = 0.9 * (1 - dist / 150);
+				ctx.lineWidth = 1;
+				ctx.moveTo(p.x, p.y);
+				ctx.lineTo(mouseX, mouseY);
+				ctx.stroke();
+			}
+		}
+
+		animationFrameRef.current = requestAnimationFrame(() => draw(ctx, width, height));
+	}, [mousePos]);
+
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+
+		const ctx = canvas.getContext('2d');
+		if (!ctx) return;
+
+		const resize = () => {
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+			const count = Math.floor((canvas.width * canvas.height) / 10000); 
+			particlesRef.current = Array.from({ length: Math.min(count, 150) }, () => new Particle(canvas.width, canvas.height));
+		};
+
+		const handleMouseMove = (e: MouseEvent) => {
+			setMousePos({ x: e.clientX, y: e.clientY });
+		};
+
+		window.addEventListener('resize', resize);
+		window.addEventListener('mousemove', handleMouseMove);
+
+		resize(); 
+		animationFrameRef.current = requestAnimationFrame(() => draw(ctx, canvas.width, canvas.height));
+
+		return () => {
+			window.removeEventListener('resize', resize);
+			window.removeEventListener('mousemove', handleMouseMove);
+			if (animationFrameRef.current) {
+				// FIX: Corrected typo from 'animationFrameFrameRef' to 'animationFrameRef'
+				cancelAnimationFrame(animationFrameRef.current);
+			}
+		};
+	}, [draw]);
+
+	return (
+		<canvas
+			ref={canvasRef}
+			className="fixed inset-0 w-full h-full z-0 opacity-90"
+			style={{ backgroundColor: COLORS.BACKGROUND }}
+		/>
+	);
+};
+
+
+// --- 4. Floating Navigation Bar Component (CONSOLIDATED MENU) ---
+const FloatingNavbar: React.FC = () => {
+	const [isOpen, setIsOpen] = useState(false);
+	
+	const links = useMemo(() => [
+		{ name: 'Home', id: 'home' },
+		{ name: 'Services', id: 'services' },
+		{ name: 'Process', id: 'process' },
+		{ name: 'FAQ', id: 'faq' },
+		{ name: 'Contact', id: 'booking' },
+	], []);
+
+
+	return (
+		<>
+			{/* Mobile/Desktop Toggle Button (Fixed top-right for ALL screen sizes) */}
+			<motion.button
+				className="fixed top-5 right-5 z-[100] p-3 rounded-full bg-slate-900/80 backdrop-blur-md border border-slate-700 glow-effect-blue"
+				onClick={() => setIsOpen(!isOpen)}
+				aria-label="Toggle Navigation"
+				whileHover={{ scale: 1.1 }}
+			>
+				<AnimatePresence mode="wait">
+					{isOpen ? (
+						<motion.div
+							key="x"
+							initial={{ rotate: 90, opacity: 0 }}
+							animate={{ rotate: 0, opacity: 1 }}
+							exit={{ rotate: -90, opacity: 0 }}
+						>
+							<X className="w-6 h-6 text-cyan-500" />
+						</motion.div>
+					) : (
+						<motion.div
+							key="menu"
+							initial={{ rotate: -90, opacity: 0 }}
+							animate={{ rotate: 0, opacity: 1 }}
+							exit={{ rotate: 90, opacity: 0 }}
+						>
+							<Menu className="w-6 h-6 text-cyan-500" />
+						</motion.div>
+					)}
+				</AnimatePresence>
+			</motion.button>
+
+			{/* Fullscreen Menu (Visible on ALL screens when open) */}
+			<AnimatePresence>
+				{isOpen && (
+					<motion.nav
+						initial={{ x: '100vw' }}
+						animate={{ x: 0 }}
+						exit={{ x: '100vw' }}
+						transition={{ type: "spring", stiffness: 100, damping: 20 }}
+						className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-xl flex flex-col justify-center items-center" 
+					>
+						<ul className="space-y-8 text-center">
+							{links.map((link) => (
+								<li key={link.id}>
+									<a
+										href={`#${link.id}`}
+										className="text-4xl font-bold text-slate-100 hover:text-cyan-500 transition-colors duration-300 font-varela"
+										onClick={() => {
+											scrollToSection(link.id);
+											setIsOpen(false);
+										}}
+									>
+										{link.name}
+									</a>
+								</li>
+							))}
+							<li>
+								<motion.button
+									className="mt-8 text-lg premium-button-blue"
+									onClick={() => scrollToSection('booking')} // All CTA buttons now go to Booking section
+									whileHover={{ scale: 1.05 }}
+								>
+									Book Discovery Call
+								</motion.button>
+							</li>
+						</ul>
+					</motion.nav>
+				)}
+			</AnimatePresence>
+		</>
+	);
+};
+
+
+// --- 5. Custom Hooks and Components ---
+const SectionContainer: React.FC<React.PropsWithChildren<{ id: string, className?: string }>> = ({ id, children, className }) => {
+	const ref = useRef(null);
+	const { scrollYProgress } = useScroll({
+		target: ref,
+		offset: ["start end", "end start"]
+	});
+    // const y = useTransform(scrollYProgress, [0, 1], [-50, 50]); // Removed this line to improve smoothness
+
+	return (
+		<motion.section
+			id={id}
+			ref={ref}
+			className={`relative py-16 md:py-24 max-w-7xl mx-auto px-6 ${className}`}
+			style={{ perspective: 1000 }}
+			initial={{ opacity: 0, y: 50 }}
+			whileInView={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.8 }}
+			viewport={{ once: true, amount: 0.3 }}
+		>
+			{children}
+		</motion.section>
+	);
+};
+
+const Card: React.FC<React.PropsWithChildren<{ className?: string }>> = ({ children, className }) => (
+	<motion.div
+		className={`tech-card-blue p-6 md:p-8 flex flex-col h-full ${className}`}
+		whileHover={{ scale: 1.02, boxShadow: '0 8px 30px rgba(14, 165, 233, 0.2)' }}
+		transition={{ type: "spring", stiffness: 300, damping: 20 }}
+	>
+		{children}
+	</motion.div>
+);
+
+
+// --- New Rotating Logo Component (LARGER SIZE and REDUCED GAP) ---
+const RotatingLogo: React.FC = () => {
+    return (
+        // Positioned high, centered, and z-indexed.
+        <div className="absolute top-12 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center"> 
+            <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ 
+                    repeat: Infinity, 
+                    duration: 40, // Very slow spin (40 seconds for one rotation)
+                    ease: "linear" 
+                }}
+            >
+                <motion.img 
+                    src={LOGO_URL} 
+                    alt="AUMESTACK Logo" 
+                    // INCREASED SIZE
+                    className="w-32 h-32 md:w-44 md:h-44 object-contain" 
+                    style={{ filter: 'drop-shadow(0 0 8px rgba(6, 182, 212, 0.6))' }}
+                    onError={handleImageError} 
+                />
+            </motion.div>
+            
+            {/* AumeStack text below logo: LARGER FONT, REDUCED GAP, and 3D EFFECT */}
+            <motion.div
+                initial={{ opacity: 1, y: 0 }}
+                animate={{ 
+                    opacity: 1, 
+                    // Subtle vertical motion for a floating 3D effect
+                    y: [0, -5, 0],
+                    // Apply subtle text shadow for depth/glow
+                    textShadow: "0 0 10px rgba(6, 182, 212, 0.8), 0 0 20px rgba(14, 165, 233, 0.5)",
+                }}
+                transition={{ 
+                    duration: 4, 
+                    repeat: Infinity, 
+                    ease: "easeInOut" 
+                }}
+                // INCREASED FONT SIZE
+                className="mt-2 text-white text-4xl md:text-6xl font-extrabold tracking-widest font-varela"
+            >
+                AumeStack
+            </motion.div>
+        </div>
+    );
+};
+
+
+// --- 6. Main Content Sections (New Headline Styling) ---
+
+const HeroSection: React.FC = () => (
+	<motion.div
+		id="home"
+        // INCREASED padding top from pt-48 to pt-64 and md:pt-64 to md:pt-80 to push the headline down 
+		className="relative min-h-screen pt-64 md:pt-80 pb-20 flex flex-col items-center justify-center text-center bg-gradient-to-b from-slate-950 to-blue-900"
+		initial={{ opacity: 0 }}
+		animate={{ opacity: 1 }}
+		transition={{ duration: 1.5 }}
+	>
+    <RotatingLogo />
+		<div className="relative z-10 max-w-4xl mx-auto px-4">
+            
+            {/* AI Automation Framework Badge - Confirmed Top Left positioning */}
+            <motion.div
+                initial={{ x: -50, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.2, duration: 0.6 }}
+                // Positioning in the top left corner (fixed position)
+                className="fixed top-10 left-6 z-50 inline-flex items-center px-4 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-cyan-400 bg-blue-900/70 backdrop-blur-sm border border-cyan-500/30 shadow-lg"
+            >
+                {/* FIX: Corrected missing JSX closing tag and added the Icon component inside the div */}
+                <Zap className="w-4 h-4 mr-2 text-cyan-500" />
+                New: AI Automation Framework
+            </motion.div>
+
+
+			<motion.h1
+				className="text-4xl md:text-6xl font-extrabold text-slate-100 mb-6 leading-tight font-varela"
+				initial={{ y: 20, opacity: 0 }}
+				animate={{ y: 0, opacity: 1 }}
+				transition={{ delay: 0.4, duration: 0.8 }}
+			>
+				<span className="gradient-text-blue">The Operating System Your Business</span> Needs to Scale.
+			</motion.h1>
+
+			<motion.p
+				className="text-lg md:text-xl text-slate-300 mb-10 max-w-2xl mx-auto font-bold"
+				initial={{ y: 20, opacity: 0 }}
+				animate={{ y: 0, opacity: 1 }}
+				transition={{ delay: 0.6, duration: 0.8 }}
+			>
+				AI-Powered. Strategy-Driven. Built for You.
+			</motion.p>
+			
+			<motion.p
+				className="text-base text-slate-400 mb-12 max-w-3xl mx-auto italic"
+				initial={{ y: 20, opacity: 0 }}
+				animate={{ y: 0, opacity: 1 }}
+				transition={{ delay: 0.7, duration: 0.8 }}
+			>
+				AUMESTACK specializes in implementing intelligent automation workflows, conversion-driven funnels, and go-to-market strategies for startups and businesses ready to scale without burning out.
+			</motion.p>
+
+			<div className="flex flex-col sm:flex-row justify-center gap-4 mb-16">
+				<motion.button
+					className="premium-button-blue flex items-center justify-center gap-2"
+					onClick={() => scrollToSection('booking')} // All CTA buttons now go to Booking section
+					initial={{ scale: 0.9, opacity: 0 }}
+					animate={{ scale: 1, opacity: 1 }}
+					transition={{ delay: 0.8, type: "spring", stiffness: 300 }}
+				>
+					<Phone className="w-5 h-5" />
+					Book Free Discovery Call
+				</motion.button>
+				<motion.button
+					className="premium-button-blue bg-none border border-cyan-500 text-cyan-400 shadow-none hover:bg-cyan-500/10 hover:shadow-cyan-500/20"
+					onClick={() => scrollToSection('services')}
+					initial={{ scale: 0.9, opacity: 0 }}
+					animate={{ scale: 1, opacity: 1 }}
+					transition={{ delay: 0.9, type: "spring", stiffness: 300 }}
+				>
+					View Our Services
+				</motion.button>
+			</div>
+
+			<motion.div
+				className="flex justify-center flex-wrap gap-x-8 gap-y-4 text-sm font-medium text-slate-400"
+				initial={{ y: 20, opacity: 0 }}
+				animate={{ y: 0, opacity: 1 }}
+				transition={{ delay: 1.0, duration: 0.8 }}
+			>
+				{/* Changed text from 'N8N Automation Experts' to 'Automation Expert' */}
+				<div className="flex items-center">
+					<CheckSquare className="w-4 h-4 mr-2 text-cyan-500" /> Automation Expert
+				</div>
+				<div className="flex items-center">
+					<Zap className="w-4 h-4 mr-2 text-cyan-500" /> 1-4 Week Delivery
+				</div>
+				<div className="flex items-center">
+					<Activity className="w-4 h-4 mr-2 text-cyan-500" /> 30-Day Optimization Included
+				</div>
+			</motion.div>
+		</div>
+	</motion.div>
+);
+
+const FeaturesBentoGrid: React.FC = () => (
+	<SectionContainer id="features" className="py-24">
+		<h2 className="text-4xl md:text-5xl font-extrabold text-center mb-16 gradient-text-blue font-varela">
+			The AUMESTACK Advantage
+		</h2>
+		<div className="grid md:grid-cols-3 gap-6 auto-rows-fr">
+			{/* Card 1: 24/7 AUTOMATED OPERATIONS (Tall) */}
+			<Card className="md:col-span-2 bg-gradient-to-br from-blue-900/50 to-slate-900/50">
+				<div className="flex justify-between items-start mb-4">
+					<Clock className="w-10 h-10 text-cyan-500" />
+					<div className="text-right">
+						<p className="text-6xl font-bold gradient-text-blue font-varela leading-none">20+</p>
+						<p className="text-xl text-slate-400 font-semibold">Hours Saved Per Week</p>
+					</div>
+				</div>
+				<h3 className="text-2xl font-bold text-slate-100 mb-3 font-varela">24/7 Automated Operations</h3>
+				<p className="text-slate-300 text-base flex-grow">Your business operations run automatically while you focus on growth and strategy. We eliminate the repetitive work.</p>
+			</Card>
+
+			{/* Card 2: ENTERPRISE SECURITY (Small) */}
+			<Card>
+				<Shield className="w-8 h-8 text-sky-500 mb-3" />
+				<h3 className="text-xl font-bold text-slate-100 mb-2 font-varela">Bank-Grade Security</h3>
+				<p className="text-slate-400 text-sm">Your data and workflows protected with enterprise-level encryption and secure integrations.</p>
+			</Card>
+
+			{/* Card 3: LIGHTNING FAST DELIVERY (Small) */}
+			<Card>
+				<Zap className="w-8 h-8 text-cyan-500 mb-3" />
+				<h3 className="text-xl font-bold text-slate-100 mb-2 font-varela">Lightning Fast Delivery</h3>
+				<p className="text-slate-400 text-sm">From discovery to live deployment in **1-4 weeks**. We move fast without compromising quality.</p>
+				<div className="w-full h-2 bg-blue-900 rounded-full mt-auto">
+					<div className="h-full bg-gradient-to-r from-cyan-500 to-sky-500 rounded-full w-3/4 animate-pulse"></div>
+				</div>
+			</Card>
+
+			{/* Card 4: AI-POWERED INTELLIGENCE (Large) */}
+			<Card className="md:col-span-2 bg-slate-800/80">
+				<h3 className="text-2xl font-bold text-slate-100 mb-4 font-varela">AI-Powered Intelligence</h3>
+				<div className="bg-slate-950 p-4 rounded-lg text-left font-mono text-sm shadow-xl border border-blue-900/50">
+					<div className="mb-2">
+						<span className="text-sky-500 font-bold">User:</span> New lead from website
+					</div>
+					<div className="flex items-start">
+						<Bot className="w-5 h-5 text-cyan-400 mr-2 flex-shrink-0 mt-0.5" />
+						<span className="text-slate-200">
+							<span className="text-green-400 font-bold">✓</span> Lead captured, CRM updated, welcome email sent.
+						</span>
+					</div>
+				</div>
+				<p className="text-slate-300 text-base mt-4 flex-grow">Smart automation that **thinks**. We implement workflows that handle complex decision-making based on real-time data.</p>
+			</Card>
+
+			{/* Card 5 & 6 Container */}
+			<div className="md:col-span-3 grid md:grid-cols-2 gap-6">
+				{/* Card 5: MVP & FUNNEL EXCELLENCE */}
+				<Card>
+					<Funnel className="w-8 h-8 text-sky-500 mb-3" />
+					<h3 className="text-xl font-bold text-slate-100 mb-2 font-varela">Full-Stack Growth Systems</h3>
+					<p className="text-slate-400 text-sm mb-3">Complete funnel strategy, landing page optimization, and go-to-market excellence.</p>
+					<div className="flex justify-between text-xs text-cyan-400 font-mono mt-auto">
+						<span>Strategy</span> &rarr; <span>Design</span> &rarr; <span>Build</span> &rarr; <span>Launch</span> &rarr; <span>Optimize</span>
+					</div>
+				</Card>
+				{/* Card 6: REAL-TIME ANALYTICS */}
+				<Card>
+					<BarChart className="w-8 h-8 text-cyan-500 mb-3" />
+					<h3 className="text-xl font-bold text-slate-100 mb-2 font-varela">Real-Time Analytics</h3>
+					<div className="grid grid-cols-3 gap-2 mt-auto">
+						<div className="text-center bg-blue-900/50 p-2 rounded-lg">
+							<p className="text-lg font-bold text-green-400 leading-none">↑ 45%</p>
+							<p className="text-xs text-slate-400">Time Saved</p>
+						</div>
+						<div className="text-center bg-blue-900/50 p-2 rounded-lg">
+							<p className="text-lg font-bold text-green-400 leading-none">↑ 60%</p>
+							<p className="text-xs text-slate-400">Lead Response</p>
+						</div>
+						<div className="text-center bg-blue-900/50 p-2 rounded-lg">
+							<p className="text-lg font-bold text-green-400 leading-none">↑ 30%</p>
+							<p className="text-xs text-slate-400">Conversion</p>
+						</div>
+					</div>
+				</Card>
+			</div>
+		</div>
+	</SectionContainer>
+);
+
+
+// --- Service Interface Definition and Data Array (Reordered for request) ---
+
+interface Service {
+	id: string;
+	Icon: React.ElementType;
+	title: string;
+	subtitle: string;
+	description: string;
+	features: string[];
+	timeline: string;
+	diagram: React.ReactNode;
+}
+
+const servicesData: Service[] = [
+	{
+		id: 'automation',
+		Icon: Settings,
+		title: 'AI Automation Ecosystems',
+		subtitle: 'Eliminate 20+ hours of manual work per week',
+		description: "Custom n8n workflows tailored to your business. We connect all your tools—WhatsApp, email, CRM, social media, Google Sheets, Notion—into one intelligent system that handles repetitive tasks automatically.",
+		features: [
+			'Custom n8n workflow automation',
+			'WhatsApp/Email/Social auto-responders',
+			'Lead capture & CRM integration',
+			'Content distribution automation',
+			'Data sync across platforms',
+			'Ongoing support & optimization',
+		],
+		timeline: '1-2 weeks (basic) | 2-4 weeks (full ecosystem)',
+		diagram: (
+			// NEW VISUAL: Text-Free Flowchart / N8N-style Workflow
+			<div className="relative w-full h-full flex items-center justify-center p-4">
+				<div className="flex flex-col items-center space-y-5">
+					{/* 1. Trigger Node */}
+					<motion.div
+						initial={{ scale: 0.5 }}
+						animate={{ scale: 1 }}
+						transition={{ type: 'spring', stiffness: 150, delay: 0.2 }}
+						className="flex items-center justify-center w-12 h-12 bg-green-600/20 rounded-full border border-green-500/50 shadow-xl"
+					>
+						<Zap className="w-6 h-6 text-green-400" />
+					</motion.div>
+
+					{/* Flow Line 1 */}
+					<motion.div
+						initial={{ height: 0 }}
+						animate={{ height: 40 }}
+						transition={{ delay: 0.5, duration: 0.5 }}
+						className="w-0.5 bg-cyan-500/50"
+					/>
+
+					{/* 2. Logic Node (AI) */}
+					<motion.div
+						initial={{ scale: 0.5 }}
+						animate={{ scale: 1 }}
+						transition={{ type: 'spring', stiffness: 150, delay: 0.8 }}
+						className="flex items-center justify-center w-16 h-16 bg-blue-900/50 rounded-lg border border-blue-500 shadow-xl"
+					>
+						<Cpu className="w-8 h-8 text-blue-400" />
+					</motion.div>
+
+					{/* Flow Line 2 (Split) */}
+					<div className="flex justify-center w-full">
+						<motion.div
+							initial={{ width: 0 }}
+							animate={{ width: '80%' }}
+							transition={{ delay: 1.2, duration: 0.6 }}
+							className="h-0.5 bg-cyan-500/50 relative"
+						>
+							<motion.div
+								initial={{ height: 0 }}
+								animate={{ height: 20 }}
+								transition={{ delay: 1.8, duration: 0.3 }}
+								className="absolute left-1/4 -translate-x-1/2 bottom-0 w-0.5 bg-cyan-500"
+							/>
+							<motion.div
+								initial={{ height: 0 }}
+								animate={{ height: 20 }}
+								transition={{ delay: 1.8, duration: 0.3 }}
+								className="absolute right-1/4 translate-x-1/2 bottom-0 w-0.5 bg-cyan-500"
+							/>
+						</motion.div>
+					</div>
+					
+					{/* 3. Action Nodes (Parallel) */}
+					<div className="flex space-x-16 -mt-3">
+						<motion.div
+							initial={{ y: 20, opacity: 0 }}
+							animate={{ y: 0, opacity: 1 }}
+							transition={{ delay: 2.0, duration: 0.5 }}
+							className="flex items-center justify-center w-12 h-12 bg-slate-700 rounded-full border border-slate-600 shadow-lg"
+						>
+							<Users className="w-6 h-6 text-sky-400" />
+						</motion.div>
+
+						<motion.div
+							initial={{ y: 20, opacity: 0 }}
+							animate={{ y: 0, opacity: 1 }}
+							transition={{ delay: 2.2, duration: 0.5 }}
+							className="flex items-center justify-center w-12 h-12 bg-slate-700 rounded-full border border-slate-600 shadow-lg"
+						>
+							<MessageCircle className="w-6 h-6 text-cyan-400" />
+						</motion.div>
+					</div>
+				</div>
+			</div>
+		),
+	},
+	{
+		id: 'funnels', // Position 2
+		Icon: TrendingUp, // Changed to TrendingUp
+		title: 'Business Funnels & Launch Systems', // Changed title
+		subtitle: 'Launch new startups and scale existing businesses in the market.', // Changed subtitle
+		description: "We help new-age startups successfully launch their products and existing businesses scale operations—all aligned with current market trends. From go-to-market strategy to conversion-optimized funnels, you get complete growth systems: high-converting landing pages, automated sequences, CRM integration, and analytics that prove ROI.", // Changed description
+		features: [
+			'Go-to-market strategy for launches & scaling', // Changed feature
+			'High-converting landing pages', 
+			'Email & WhatsApp automation sequences', // Changed feature
+			'CRM integration & lead tracking', // Changed feature
+			'A/B testing & performance optimization', 
+			'Real-time analytics dashboard', // Changed feature
+		],
+		timeline: '2-3 weeks',
+		diagram: (
+			// Simplified Launch Diagram
+			<div className="flex flex-col items-center justify-center h-full space-y-4">
+				<motion.div 
+					initial={{ y: -50, opacity: 0 }}
+					animate={{ y: 0, opacity: 1 }}
+					transition={{ type: 'spring', stiffness: 100 }}
+					className="bg-sky-500/20 p-3 rounded-full border-2 border-sky-500 shadow-xl"
+				>
+					<Rocket className="w-8 h-8 text-sky-500" /> {/* Changed icon for Launch */}
+				</motion.div>
+				<TrendingUp className="w-8 h-8 text-cyan-500 animate-pulse" />
+				<div className="text-center mt-4">
+					<p className="text-sm font-bold text-slate-200">GTM Strategy</p>
+					<div className="text-xs text-slate-400">Launch &rarr; Conversion &rarr; Scale</div>
+				</div>
+				<Funnel className="w-16 h-16 text-blue-900/50 mt-4" />
+			</div>
+		),
+	},
+	{
+		id: 'chatbots', // Position 3
+		Icon: MessageCircle,
+		title: 'AI-Powered Chatbots',
+		subtitle: 'Convert visitors into qualified leads 24/7',
+		description: "Intelligent conversational systems for your website and WhatsApp that engage visitors, answer questions, qualify leads, and integrate with your CRM—all without human intervention.",
+		features: [
+			'Website & WhatsApp chatbot setup',
+			'Lead qualification & data collection',
+			'CRM/sales pipeline integration',
+			'Custom conversation flows',
+			'Analytics & performance tracking',
+			'30-day post-launch optimization',
+		],
+		timeline: '1-2 weeks',
+		diagram: (
+			// Chatbot Diagram kept
+			<div className="bg-slate-900/50 p-4 rounded-xl h-full flex flex-col justify-end relative overflow-hidden">
+				<Bot className="absolute top-4 right-4 w-12 h-12 text-blue-900/50" />
+				<motion.div
+					initial={{ y: 200 }}
+					animate={{ y: 0 }}
+					transition={{ type: 'spring', stiffness: 100, delay: 0.3 }}
+					className="space-y-3"
+				>
+					<div className="flex justify-start">
+						<div className="bg-blue-900 text-slate-200 p-2 rounded-xl rounded-bl-none max-w-[80%] shadow-lg">Hello! I see you're interested in AI. What's your business goal?</div>
+					</div>
+					<div className="flex justify-end">
+						<div className="bg-cyan-500 text-slate-900 p-2 rounded-xl rounded-br-none max-w-[80%] shadow-lg font-semibold">I need to save time on lead qualification.</div>
+					</div>
+					<div className="flex justify-start">
+						<div className="bg-blue-900 text-slate-200 p-2 rounded-xl rounded-bl-none max-w-[80%] shadow-lg">Got it. I'll need 3 pieces of info to qualify you. Ready?</div>
+					</div>
+					<div className="flex justify-end">
+						<div className="bg-cyan-500 text-slate-900 p-2 rounded-xl rounded-br-none max-w-[80%] shadow-lg font-semibold">Yes, proceed.</div>
+					</div>
+				</motion.div>
+			</div>
+		),
+	},
+	{
+		id: 'consulting', // Position 4
+		Icon: Lightbulb,
+		title: 'AI & Growth Strategy Consulting',
+		subtitle: 'Battle-tested roadmap to scale with AI',
+		description: "AI implementation audit, market research, go-to-market strategy, growth frameworks, and hands-on implementation support—not just slide decks you'll never use.",
+		features: [
+			'AI implementation audit & analysis',
+			'Market research & competitive intelligence',
+			'Go-to-market strategy development',
+			'Growth frameworks for your business model',
+			'Product positioning & messaging',
+			'Hands-on implementation support',
+		],
+		timeline: '2-4 weeks (strategy) | Ongoing support available',
+		diagram: (
+			// Consulting Diagram kept
+			<div className="flex flex-col items-center justify-center h-full space-y-4">
+				<Layers className="w-12 h-12 text-blue-900/50" />
+				<div className="grid grid-cols-2 gap-4 text-center">
+					<motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="bg-sky-500/20 p-3 rounded-lg text-sm font-semibold text-slate-100">Audit</motion.div>
+					<motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="bg-sky-500/20 p-3 rounded-lg text-sm font-semibold text-slate-100">GTM</motion.div>
+					<motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.6 }} className="bg-sky-500/20 p-3 rounded-lg text-sm font-semibold text-slate-100">Frameworks</motion.div>
+					<motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.8 }} className="bg-sky-500/20 p-3 rounded-lg text-sm font-semibold text-slate-100">Execute</motion.div>
+				</div>
+			</div>
+		),
+	},
+];
+
+
+// --- Services Toggle Component ---
+const ServicesToggle: React.FC = () => {
+	const [activeTab, setActiveTab] = useState('automation');
+	const activeService = servicesData.find(s => s.id === activeTab) || servicesData[0];
+
+	return (
+		<SectionContainer id="services" className="py-24">
+			<h2 className="text-4xl md:text-5xl font-extrabold text-center mb-16 gradient-text-blue font-varela">
+				Our Core AI Services
+			</h2>
+
+			{/* Tabs / Toggle (Order updated here) */}
+			<div className="flex justify-center flex-wrap gap-4 mb-12">
+				{servicesData.map((service) => (
+					<motion.button
+						key={service.id}
+						onClick={() => setActiveTab(service.id)}
+						className={`flex items-center gap-2 px-5 py-3 rounded-full font-semibold transition-all duration-300 border ${
+							activeTab === service.id
+								? 'bg-blue-900 text-white border-cyan-500 shadow-lg shadow-cyan-500/20'
+								: 'bg-slate-900/50 text-slate-300 border-slate-700 hover:border-sky-500 hover:text-sky-500'
+						}`}
+						whileHover={{ scale: 1.05 }}
+					>
+						<service.Icon className="w-5 h-5" />
+						<span className="hidden sm:inline">{service.title}</span>
+					</motion.button>
+				))}
+			</div>
+
+			{/* Content Card */}
+			<Card className="p-8 md:p-12">
+				<div className="grid md:grid-cols-2 gap-10">
+					{/* Left: Diagram/Animation */}
+					<div className="h-64 md:h-full bg-slate-950 rounded-xl p-4 overflow-hidden flex items-center justify-center border border-blue-900">
+						{activeService.diagram}
+					</div>
+
+					{/* Right: Details */}
+					<motion.div
+						key={activeTab}
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.5 }}
+					>
+						<activeService.Icon className="w-10 h-10 text-cyan-500 mb-3" />
+						<h3 className="text-3xl font-bold text-slate-100 mb-1 font-varela">{activeService.title}</h3>
+						<p className="text-sky-500 font-medium mb-4">{activeService.subtitle}</p>
+						<p className="text-slate-300 mb-6 text-base">{activeService.description}</p>
+
+						<ul className="space-y-2 mb-8 text-slate-200 text-sm">
+							{activeService.features.map((feature, index) => (
+								<li key={index} className="flex items-center">
+									<CheckSquare className="w-4 h-4 text-green-400 mr-3 flex-shrink-0" />
+									{feature}
+								</li>
+							))}
+						</ul>
+
+						<div className="flex justify-between items-center text-sm font-semibold border-t border-slate-700 pt-4">
+							{/* Removed Investment Display */}
+							<div className="text-slate-400">Timeline: <span className="text-slate-100">{activeService.timeline}</span></div>
+							{/* Replaced investment display with general custom pricing message */}
+							<div className="text-slate-400">Pricing: <span className="text-cyan-400 font-bold">Custom Quote</span></div>
+						</div>
+
+						<motion.button
+							className="premium-button-blue w-full mt-8"
+							onClick={() => scrollToSection('booking')}
+							whileHover={{ scale: 1.02 }}
+						>
+							{activeService.id === 'funnels' ? 'Get Custom Quote' : 'Book Discovery Call'} {/* Updated Funnels CTA */}
+						</motion.button>
+					</motion.div>
+				</div>
+			</Card>
+		</SectionContainer>
+	);
+};
+
+
+// --- Process Timeline ---
+interface ProcessStep {
+	step: number;
+	title: string;
+	Icon: React.ElementType;
+	description: string;
+	color: string; // Tailwind gradient classes
+}
+
+const processSteps: ProcessStep[] = [
+	{ step: 1, title: 'Discovery Call (Free)', Icon: Phone, description: 'We understand your business, challenges, and goals. No sales pitch—just clarity on what you need and how we can help.', color: 'from-cyan-600 to-sky-600' },
+	{ step: 2, title: 'Strategy Meeting', Icon: Target, description: "We present a custom solution tailored to your needs with timelines, deliverables, and expected outcomes. You'll know exactly what you're getting.", color: 'from-sky-600 to-blue-700' }, // Tallybox replaced with Target
+	{ step: 3, title: 'Proposal & Contract', Icon: FileText, description: "Transparent pricing. Clear scope. No hidden fees. Everything documented so there's zero confusion.", color: 'from-blue-700 to-cyan-600' },
+	{ step: 4, title: 'Prepayment & Kickoff', Icon: Rocket, description: "We begin building immediately. You get access to our project dashboard for real-time progress tracking.", color: 'from-cyan-600 to-sky-600' },
+	{ step: 5, title: 'Build & Delivery', Icon: Code, description: "Regular updates every 2-3 days. You're involved at key milestones. We iterate based on your feedback.", color: 'from-sky-600 to-blue-700' },
+	{ step: 6, title: 'Post-Delivery Support', Icon: Shield, description: "30-day optimization included. If something isn't working, we fix it—no additional charges. Final payment only when you're satisfied.", color: 'from-blue-700 to-cyan-600' },
+];
+
+const ProcessTimeline: React.FC = () => (
+	<SectionContainer id="process" className="py-24">
+		<h2 className="text-4xl md:text-5xl font-extrabold text-center mb-4 gradient-text-blue font-varela">
+			Our Regular Connectivity Framework
+		</h2>
+		<p className="text-center text-xl text-slate-400 mb-16">
+			We don't ghost you. We stay connected, iterate, and ensure results.
+		</p>
+		<div className="relative">
+			<div className="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-cyan-500/20"></div>
+
+			{processSteps.map((step, index) => (
+				<motion.div
+					key={step.step}
+					className="relative flex items-center w-full my-12"
+					initial={{ opacity: 0, x: index % 2 === 0 ? -100 : 100 }}
+					whileInView={{ opacity: 1, x: 0 }}
+					transition={{ duration: 0.6, delay: 0.1 * index }}
+					viewport={{ once: true, amount: 0.5 }}
+				>
+					{/* Timeline Item Container */}
+					<div className={`w-full md:w-1/2 ${index % 2 !== 0 ? 'order-last md:ml-auto' : 'md:mr-auto'}`}>
+						<Card className={`p-5 md:p-8 ${index % 2 !== 0 ? 'md:text-right' : 'md:text-left'}`}>
+							<div className={`flex items-center mb-3 ${index % 2 !== 0 ? 'flex-row-reverse justify-start' : 'justify-start'}`}>
+								<div className={`w-8 h-8 rounded-full bg-gradient-to-r ${step.color} flex items-center justify-center text-white font-bold ${index % 2 !== 0 ? 'ml-3' : 'mr-3'}`}>
+									{step.step}
+								</div>
+								<h3 className="text-xl font-bold text-slate-100 font-varela">{step.title}</h3>
+							</div>
+							<p className="text-slate-300 text-sm">{step.description}</p>
+						</Card>
+					</div>
+
+					{/* Central Icon */}
+					<div className="absolute left-1/2 transform -translate-x-1/2 z-10">
+						<div className={`w-10 h-10 rounded-full bg-slate-950 border-4 border-cyan-500 flex items-center justify-center`}>
+							<step.Icon className="w-5 h-5 text-cyan-500" />
+						</div>
+					</div>
+				</motion.div>
+			))}
+		</div>
+	</SectionContainer>
+);
+
+// --- Why Choose Us ---
+const WhyChooseUs: React.FC = () => (
+	<SectionContainer id="why-us" className="py-24">
+		<h2 className="text-4xl md:text-5xl font-extrabold text-center mb-16 gradient-text-blue font-varela">
+			Why Businesses Choose AUMESTACK
+		</h2>
+		<div className="grid md:grid-cols-3 gap-8">
+			{[
+				{ Icon: Zap, stat: "1-4 Weeks", title: "Fast Execution, Zero Delays", description: "Most agencies take 6-8 weeks. We deliver in 1-4 weeks without compromising quality. Speed is our competitive edge because in business, time is money." },
+				{ Icon: Activity, stat: "Updates Every 2-3 Days", title: "Regular Connectivity Framework", description: "You're not just a ticket number. We maintain consistent communication throughout the project. No ghosting. No surprises. You always know what's happening." },
+				{ Icon: Cpu, stat: "5+ Years Experience", title: "Product Management Expertise Meets AI", description: "We're not just tech builders—we're strategists with deep product management and business experience. We build solutions that align with your actual business goals." },
+			].map((item, index) => (
+				<motion.div
+					key={index}
+					className="tech-card-blue p-8 text-center"
+					initial={{ opacity: 0, scale: 0.8 }}
+					whileInView={{ opacity: 1, scale: 1 }}
+					transition={{ duration: 0.5, delay: 0.1 * index }}
+					viewport={{ once: true, amount: 0.5 }}
+					whileHover={{ scale: 1.05 }}
+				>
+					<item.Icon className="w-10 h-10 text-cyan-500 mx-auto mb-4" />
+					<p className="text-sm font-semibold uppercase tracking-widest text-sky-500 mb-2">{item.stat}</p>
+					<h3 className="text-xl font-bold text-slate-100 mb-3 font-varela">{item.title}</h3>
+					<p className="text-slate-400 text-sm">{item.description}</p>
+				</motion.div>
+			))}
+		</div>
+	</SectionContainer>
+);
+
+// CredibilityCards component removed as requested.
+
+const GuaranteeSection: React.FC = () => (
+	<SectionContainer id="guarantee" className="py-24">
+		<motion.div
+			className="tech-card-blue p-8 md:p-16 text-center bg-gradient-to-br from-blue-900/50 to-slate-900/50 border-cyan-500/50"
+			initial={{ scale: 0.9, opacity: 0 }}
+			whileInView={{ scale: 1, opacity: 1 }}
+			transition={{ duration: 0.6 }}
+			viewport={{ once: true, amount: 0.5 }}
+			style={{ boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)' }}
+		>
+			<Shield className="w-16 h-16 text-cyan-500 mx-auto mb-6" />
+			<h2 className="text-4xl md:text-5xl font-extrabold mb-8 gradient-text-blue font-varela">
+				Our Promise to You
+			</h2>
+			<div className="grid md:grid-cols-2 gap-8 text-left">
+				{[
+					{ text: "VISIBLE TIME SAVINGS WITHIN 30 DAYS", detail: "Or we optimize until you do—at no additional cost" },
+					{ text: "CLEAR DOCUMENTATION & TRAINING", detail: "You're never dependent on us to operate your own systems" },
+					{ text: "NO LOCK-IN CONTRACTS", detail: "If we don't deliver value, you don't pay the balance" },
+					{ text: "POST-DELIVERY SUPPORT INCLUDED", detail: "Every project includes 30-day optimization and support" },
+				].map((item, index) => (
+					<motion.div
+						key={index}
+						className="p-4 bg-slate-900/50 rounded-lg border-l-4 border-sky-500"
+						initial={{ x: index % 2 === 0 ? -20 : 20, opacity: 0 }}
+						whileInView={{ x: 0, opacity: 1 }}
+						transition={{ duration: 0.5, delay: 0.2 * index }}
+						viewport={{ once: true, amount: 0.5 }}
+					>
+						<p className="text-xl font-bold text-slate-100 mb-1 flex items-center">
+							<CheckSquare className="w-5 h-5 text-cyan-500 mr-2" /> {item.text}
+						</p>
+						<p className="text-sm text-slate-400 italic">{item.detail}</p>
+					</motion.div>
+				))}
+			</div>
+		</motion.div>
+	</SectionContainer>
+);
+
+
+// FounderSection component removed as requested.
+
+
+// --- Booking Section ---
+const BookingSection: React.FC = () => (
+	<SectionContainer id="booking" className="py-24">
+		<h2 className="text-4xl md:text-5xl font-extrabold text-center mb-4 gradient-text-blue font-varela">
+			Let's Get Started
+		</h2>
+		<p className="text-center text-xl text-slate-400 mb-16">
+			Book a free discovery call or message us directly
+		</p>
+
+		<div className="grid md:grid-cols-2 gap-12">
+			{/* Left: What to Expect */}
+			<div className="space-y-6">
+				<h3 className="text-2xl font-bold text-slate-100 mb-4 font-varela">What to Expect</h3>
+				{[
+					'15-30 minute discovery call',
+					'Discuss your business challenges',
+					'Identify automation opportunities',
+					'Get honest assessment (no BS sales pitch)',
+					'Receive custom solution proposal',
+				].map((item, index) => (
+					<motion.div
+						key={index}
+						className="flex items-start p-4 bg-slate-900/50 rounded-lg border border-slate-800"
+						initial={{ x: -20, opacity: 0 }}
+						whileInView={{ x: 0, opacity: 1 }}
+						transition={{ duration: 0.5, delay: 0.1 * index }}
+						viewport={{ once: true, amount: 0.5 }}
+					>
+						<CheckSquare className="w-5 h-5 text-cyan-500 mr-4 flex-shrink-0 mt-1" />
+						<p className="text-lg text-slate-300">{item}</p>
+					</motion.div>
+				))}
+				<div className="pt-4 text-center md:text-left">
+					<p className="text-lg font-semibold text-slate-300">Direct Contact Info:</p>
+					<div className="flex flex-wrap gap-x-6 gap-y-2 mt-2 justify-center md:justify-start">
+						<a href="mailto:infoaume.in@gmail.com" className="flex items-center text-sm text-slate-400 hover:text-cyan-500 transition-colors">
+							<Mail className="w-4 h-4 mr-2" /> infoaume.in@gmail.com
+						</a>
+						<p className="flex items-center text-sm text-slate-400">
+							<Phone className="w-4 h-4 mr-2" /> +91 9372998318
+						</p>
+						<p className="flex items-center text-sm text-slate-400">
+							<Clock className="w-4 h-4 mr-2" /> Response Time: Under 2 hours
+						</p>
+					</div>
+				</div>
+			</div>
+
+			{/* Right: Booking Card */}
+			<Card className="p-8 bg-gradient-to-br from-blue-900/50 to-slate-900/50">
+				<Cpu className="w-12 h-12 text-cyan-500 mb-4 mx-auto" />
+				<h3 className="text-3xl font-bold text-slate-100 mb-2 text-center font-varela">Ready to Reclaim Your Time?</h3>
+				<p className="text-center text-slate-300 mb-8">Stop wasting 20+ hours every week on tasks a machine can do better.</p>
+
+				{/* Option 1: Discovery Call */}
+				<motion.button
+					className="premium-button-blue w-full mb-4 text-lg"
+					onClick={() => scrollToSection('booking')}
+					whileHover={{ scale: 1.05 }}
+				>
+					<div className="flex justify-between items-center">
+						<span>Book Free Discovery Call</span>
+						<span className="text-xs font-normal bg-slate-900/50 px-2 py-1 rounded-full border border-cyan-500/50">30 min / Free</span>
+					</div>
+				</motion.button>
+
+				{/* Option 2: Direct Chat */}
+				<motion.button
+					className="premium-button-blue w-full bg-none border border-sky-500 text-sky-400 shadow-none hover:bg-sky-500/10 hover:shadow-sky-500/20"
+					onClick={openWhatsAppChat}
+					whileHover={{ scale: 1.05 }}
+				>
+					<div className="flex justify-between items-center">
+						<span>Message on WhatsApp</span>
+						<span className="text-xs font-normal bg-slate-900/50 px-2 py-1 rounded-full border border-sky-500/50">Under 2h response</span>
+					</div>
+				</motion.button>
+			</Card>
+		</div>
+	</SectionContainer>
+);
+
+// --- FAQ Accordion ---
+interface FaqItemProps {
+	question: string;
+	answer: string;
+	isOpen: boolean;
+	setIsOpen: () => void;
+}
+
+const FaqItem: React.FC<FaqItemProps> = ({ question, answer, isOpen, setIsOpen }) => (
+	<motion.div
+		className="tech-card-blue mb-4 cursor-pointer p-6"
+		onClick={setIsOpen}
+		initial={{ opacity: 0, y: 20 }}
+		whileInView={{ opacity: 1, y: 0 }}
+		transition={{ duration: 0.5 }}
+		viewport={{ once: true, amount: 0.3 }}
+	>
+		<div className="flex justify-between items-center">
+			<h3 className="text-xl font-semibold text-slate-100 font-varela pr-4">{question}</h3>
+			<motion.div
+				animate={{ rotate: isOpen ? 180 : 0 }}
+				transition={{ duration: 0.3 }}
+			>
+				<ChevronDown className="w-6 h-6 text-cyan-500" />
+			</motion.div>
+		</div>
+		<AnimatePresence>
+			{isOpen && (
+				<motion.div
+					initial={{ height: 0, opacity: 0 }}
+					animate={{ height: 'auto', opacity: 1 }}
+					exit={{ height: 0, opacity: 0 }}
+					transition={{ duration: 0.3 }}
+					className="overflow-hidden pt-4"
+				>
+					<p className="text-slate-300 text-base border-t border-slate-700 pt-4">{answer}</p>
+				</motion.div>
+			)}
+		</AnimatePresence>
+	</motion.div>
+);
+
+const FAQSection: React.FC = () => {
+	const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+	const faqData = useMemo(() => [
+		{ q: "Do I need technical knowledge to work with you?", a: "Not at all. We handle everything—from setup to training. You'll understand how your systems work, but you won't need to code anything. We provide complete documentation and hands-on training." },
+		{ q: "What if I don't see results?", a: "We include 30-day post-delivery optimization. If systems aren't performing as expected, we refine them until they do—at no extra cost. Your success is our success." },
+		{ q: "Can you work with my existing tools?", a: "Yes. We integrate with most CRMs (HubSpot, Pipedrive, Zoho), email platforms (Gmail, Outlook), Google Workspace, social media tools, WhatsApp Business API, and custom APIs. If you use it, we can likely automate it." },
+		{ q: "How long does implementation take?", a: "Basic automation: 1-2 weeks. Full ecosystem setup: 2-4 weeks. Strategy projects: 2-4 weeks. We move fast without compromising quality. You'll see progress every 2-3 days." },
+		{ q: "Do you offer monthly retainers?", a: "Absolutely. For businesses needing ongoing automation, optimization, and support, we offer retainer packages starting at ₹25,000/month. Perfect for scaling companies with evolving needs." },
+		{ q: "What makes you different from other agencies?", a: "Three things: (1) We deliver in 1-4 weeks, not 6-8 weeks. (2) We maintain regular connectivity—updates every 2-3 days, no ghosting. (3) We combine product management expertise with AI technical skills, so you get strategy + execution." },
+		{ q: "What's included in the 30-day support?", a: "Bug fixes, performance optimization, workflow adjustments, additional training, and troubleshooting—all included. Think of it as a warranty period where we ensure everything runs perfectly." },
+		{ q: "Can you help with strategy, not just implementation?", a: "Yes! Our AI & Growth Strategy Consulting service includes market research, competitive analysis, go-to-market planning, and growth frameworks. We're not just builders—we're strategic partners." },
+	], []);
+
+	return (
+		<SectionContainer id="faq" className="py-24">
+			<h2 className="text-4xl md:text-5xl font-extrabold text-center mb-16 gradient-text-blue font-varela">
+				Frequently Asked Questions
+			</h2>
+			<div>
+				{faqData.map((item, index) => (
+					<FaqItem
+						key={index}
+						question={item.q}
+						answer={item.a}
+						isOpen={openIndex === index}
+						setIsOpen={() => setOpenIndex(openIndex === index ? null : index)}
+					/>
+				))}
+			</div>
+			<motion.button
+				className="premium-button-blue mx-auto mt-12 block"
+				onClick={() => scrollToSection('booking')} // All CTA buttons now go to Booking section
+				whileHover={{ scale: 1.05 }}
+			>
+				Still Have Questions? Let's Talk
+			</motion.button>
+		</SectionContainer>
+	);
+};
+
+
+// --- Final CTA Section (With new background image integrated) ---
+const FinalCTA: React.FC = () => (
+	<motion.div
+		id="final-cta"
+		className="w-full py-20 text-center bg-gradient-to-r from-blue-900 to-cyan-500 shadow-2xl shadow-cyan-500/50 relative overflow-hidden"
+		initial={{ opacity: 0, y: 50 }}
+		whileInView={{ opacity: 1, y: 0 }}
+		transition={{ duration: 0.8 }}
+		viewport={{ once: true, amount: 0.5 }}
+	>
+        {/* === Background Image (z-0) === */}
+        <img
+            src={FOOTER_BG_LOGO_URL}
+            alt="AumeStack Background Pattern"
+            // Absolute positioning, low opacity for blending
+            className="absolute inset-0 w-full h-full object-cover opacity-5 pointer-events-none z-0"
+            onError={handleImageError}
+        />
+        {/* === Content (z-10) === */}
+        <div className="relative z-10">
+            <h2 className="text-4xl md:text-6xl font-extrabold text-white mb-4 font-varela">
+                Ready to leverage Your Business? {/* CHANGED TEXT */}
+            </h2>
+            <p className="text-xl text-slate-100 mb-10">
+                Stop wasting time on manual tasks. Let's build your automation ecosystem.
+            </p>
+            <motion.button
+                className="premium-button-blue px-10 py-5 text-xl bg-slate-900 text-white hover:bg-slate-800"
+                onClick={() => scrollToSection('booking')} // All CTA buttons now go to Booking section
+                whileHover={{ scale: 1.05 }}
+                style={{ boxShadow: '0 0 30px rgba(255, 255, 255, 0.5)' }}
+            >
+                Book Free Discovery Call
+            </motion.button>
+            <p className="text-slate-200 mt-4 text-sm">Average response time: Under 2 hours</p>
+
+            <div className="flex justify-center flex-wrap gap-x-8 gap-y-2 mt-8 text-sm font-semibold text-white">
+                <div className="flex items-center">
+                    <Zap className="w-4 h-4 mr-2 text-slate-100" /> 1-4 Week Setup
+                </div>
+                <div className="flex items-center">
+                    <TrendingUp className="w-4 h-4 mr-2 text-slate-100" /> Custom Quote Required
+                </div>
+                <div className="flex items-center">
+                    <Shield className="w-4 h-4 mr-2 text-slate-100" /> 30-Day Guarantee
                 </div>
             </div>
         </div>
-    </section>
+	</motion.div>
+);
 
-    <section id="contact">
-        <div class="contact-form-container">
-            <h2 class="contact-heading">Let's Get Started</h2>
-            <div class="contact-form">
-                <div class="form-group">
-                    <label for="name">Name*</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="phone">Phone (WhatsApp preferred)*</label>
-                    <input type="tel" id="phone" name="phone" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email*</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="linkedin">LinkedIn (Optional)</label>
-                    <input type="url" id="linkedin" name="linkedin">
-                </div>
-                <div class="form-group">
-                    <label for="business-name">Business Name (Optional)</label>
-                    <input type="text" id="business-name" name="business-name">
-                </div>
-                <div class="form-group">
-                    <label for="city">City*</label>
-                    <input type="text" id="city" name="city" required>
-                </div>
-                <button type="submit" class="btn filled" onclick="sendToWhatsApp()">Submit</button>
-            </div>
-        </div>
-        <img id="contact-image" src="https://i.ibb.co/SXVdPKVL/final-logo-06.png" alt="Aumestack new logo" class="contact-image">
-        <!-- New message box for validation feedback -->
-        <div id="message-box" class="message-box"></div>
-    </section>
+// --- Footer Component (Social links and copyright updated) ---
+const Footer: React.FC = () => (
+	<footer className="bg-slate-900 text-slate-400 pt-16 border-t border-slate-800 relative z-10">
+		<div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-10 pb-12">
+			{/* Column 1: Company (Replaced Text with Image) */}
+			<div>
+				<div className="flex items-center text-slate-100 font-bold text-xl mb-3">
+					<img 
+                        src={LOGO_URL} 
+                        alt="AUMESTACK Logo" 
+                        className="w-8 h-8 object-contain mr-2"
+                        onError={handleImageError}
+                    />
+					<span className="text-xl font-bold">AUMESTACK</span>
+				</div>
+				<p className="text-sm font-semibold text-sky-500 mb-3">AI Automation & Growth Systems</p>
+				<p className="text-xs">We help businesses scale faster by eliminating manual work and building intelligent automation systems.</p>
+			</div>
 
-    <footer>
-        <p>&copy; 2025 AUMESTACK. All rights reserved.</p>
-        <p>For any queries contact: <a href="mailto:infoaume.in@gmail.com">infoaume.in@gmail.com</a></p>
-    </footer>
+			{/* Column 2: Services */}
+			<div>
+				<h3 className="text-lg font-semibold text-slate-100 mb-4 font-varela">Services</h3>
+				<ul className="space-y-2 text-sm">
+					{servicesData.map((service) => (
+						<li key={service.id}>
+							<a href={`#services`} onClick={(e) => { e.preventDefault(); scrollToSection('services'); }} className="hover:text-cyan-500 transition-colors">{service.title}</a>
+						</li>
+					))}
+				</ul>
+			</div>
 
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="https://unpkg.com/typewriter-effect@latest/dist/core.js"></script>
-    <script>
-        // Register GSAP plugins
-        gsap.registerPlugin(ScrollTrigger);
+			{/* Column 3: Company (Pricing removed) */}
+			<div>
+				<h3 className="text-lg font-semibold text-slate-100 mb-4 font-varela">Company</h3>
+				<ul className="space-y-2 text-sm">
+					<li><a href="#why-us" onClick={(e) => { e.preventDefault(); scrollToSection('why-us'); }} className="hover:text-cyan-500 transition-colors">Why Choose Us</a></li>
+					<li><a href="#process" onClick={(e) => { e.preventDefault(); scrollToSection('process'); }} className="hover:text-cyan-500 transition-colors">Our Process</a></li>
+					<li><a href="#faq" onClick={(e) => { e.preventDefault(); scrollToSection('faq'); }} className="hover:text-cyan-500 transition-colors">FAQ</a></li>
+				</ul>
+			</div>
 
-        // --- Helper Functions ---
+			{/* Column 4: Contact (Social links removed) */}
+			<div>
+				<h3 className="text-lg font-semibold text-slate-100 mb-4 font-varela">Contact</h3>
+				<ul className="space-y-3 text-sm">
+					<li className="flex items-center">
+						<Mail className="w-4 h-4 mr-2 text-sky-500" /> infoaume.in@gmail.com
+					</li>
+					<li className="flex items-center">
+						<Phone className="w-4 h-4 mr-2 text-sky-500" /> +91 9372998318
+					</li>
+					<li className="flex items-center">
+						<MapPin className="w-4 h-4 mr-2 text-sky-500" /> Based in India | Serving Globally
+					</li>
+				</ul>
+			</div>
+		</div>
 
-        /**
-         * A custom message function to avoid using alert().
-         * @param {string} message - The message to display.
-         * @param {number} duration - How long to show the message in ms.
-         */
-        function showMessage(message, duration = 3000) {
-            const msgBox = document.getElementById('message-box');
-            msgBox.textContent = message;
-            msgBox.classList.add('visible');
-            setTimeout(() => {
-                msgBox.classList.remove('visible');
-            }, duration);
-        }
+		{/* Bottom Bar (Copyright updated) */}
+		<div className="border-t border-slate-800 py-4 px-6 text-xs flex justify-between max-w-7xl mx-auto">
+			<p>&copy; 2025 AumeVerse. All rights reserved.</p> {/* CHANGED COPYRIGHT TEXT */}
+			<div className="space-x-4">
+				<a href="#" className="hover:text-cyan-500 transition-colors">Privacy Policy</a>
+				<span>|</span>
+				<a href="#" className="hover:text-cyan-500 transition-colors">Terms of Service</a>
+			</div>
+		</div>
+	</footer>
+);
 
-        function typeWriter(element, text, i = 0) {
-            if (!element) return;
-            if (i < text.length) {
-                element.textContent += text.charAt(i);
-                setTimeout(() => typeWriter(element, text, i + 1), 20);
-            }
-        }
 
-        function sendToWhatsApp() {
-            // Define the recipient phone number here
-            const whatsappNumber = '919372998318';
+// --- 9. Main App Component (Final structure) ---
+const App: React.FC = () => {
+	return (
+		<div className="min-h-screen bg-slate-950 font-inter text-slate-100 antialiased" style={{ fontFamily: 'Inter, sans-serif' }}>
+			{/* Custom Styles */}
+			<style>{customStyles}</style>
+			
+			{/* Persistent Background */}
+			<NeuralNetworkBackground />
+			
+			{/* Fixed UI Elements */}
+			<FloatingNavbar />
 
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
-            const email = document.getElementById('email').value;
-            const linkedin = document.getElementById('linkedin').value;
-            const businessName = document.getElementById('business-name').value;
-            const city = document.getElementById('city').value;
+			{/* Scrollable Content */}
+			<div className="relative z-10">
+				<HeroSection />
+				<FeaturesBentoGrid />
+				<ServicesToggle />
+				<ProcessTimeline />
+				<WhyChooseUs />
+				<GuaranteeSection />
+				<BookingSection />
+				<FAQSection />
+				<FinalCTA /> {/* Final CTA now contains the background image */}
+				<Footer />
+			</div>
+		</div>
+	);
+};
 
-            if (!name || !phone || !email || !city) {
-                // Using the custom showMessage function instead of alert()
-                showMessage("Please fill in all required fields (Name, Phone, Email, City).");
-                return;
-            }
-
-            const message = `
-*New Inquiry from the website!*
-
-*Name:* ${name}
-*Phone:* ${phone}
-*Email:* ${email}
-*LinkedIn:* ${linkedin || 'N/A'}
-*Business Name:* ${businessName || 'N/A'}
-*City:* ${city}
-            `.trim();
-
-            const encodedMessage = encodeURIComponent(message);
-            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-
-            window.open(whatsappUrl, '_blank');
-        }
-
-        // --- GSAP Animations ---
-
-        function setupPageLoadAnimations() {
-            const brandLogo = document.querySelector('.brand-logo-main');
-            const brandName = document.querySelector('.brand-name');
-            const taglineElement = document.querySelector('.tagline');
-            
-            gsap.from(brandLogo, { opacity: 0, scale: 0.5, duration: 1.5, ease: "back.out(1.7)" });
-            gsap.from(brandName, { opacity: 0, y: 20, duration: 1 });
-            
-            if (taglineElement) {
-                const originalText = taglineElement.textContent;
-                taglineElement.textContent = '';
-                typeWriter(taglineElement, originalText);
-            }
-        }
-
-        function setupScrollAnimations() {
-            // About section heading
-            const aboutHeading = document.querySelector("#about h2");
-            const headingContainer = document.createElement('div');
-            headingContainer.className = 'heading-container';
-            headingContainer.innerHTML = `<span class="about-text">About</span><span class="aumestack-text">AumeStack</span>`;
-            
-            if (aboutHeading && aboutHeading.parentNode) {
-                aboutHeading.parentNode.insertBefore(headingContainer, aboutHeading);
-                aboutHeading.remove();
-            
-                gsap.fromTo(headingContainer.querySelector(".about-text"), { x: "-100%", opacity: 0 }, {
-                    x: "0%",
-                    opacity: 1,
-                    scrollTrigger: {
-                        trigger: "#about",
-                        start: "top 80%",
-                        end: "bottom 20%",
-                        toggleActions: "play reverse play reverse",
-                    }
-                });
-                gsap.fromTo(headingContainer.querySelector(".aumestack-text"), { x: "100%", opacity: 0 }, {
-                    x: "0%",
-                    opacity: 1,
-                    scrollTrigger: {
-                        trigger: "#about",
-                        start: "top 80%",
-                        end: "bottom 20%",
-                        toggleActions: "play reverse play reverse"
-                    }
-                });
-            }
-
-            // Individual service cards
-            const serviceCards = document.querySelectorAll('.service-card');
-            serviceCards.forEach((card, index) => {
-                gsap.fromTo(card, { x: index % 2 === 0 ? -100 : 100, opacity: 0, rotateY: index % 2 === 0 ? -90 : 90 }, {
-                    x: 0,
-                    opacity: 1,
-                    rotateY: 0,
-                    /* Changed duration from 1s to 0.6s for a snappier feel */
-                    duration: 0.6,
-                    ease: "power2.out",
-                    scrollTrigger: {
-                        trigger: card,
-                        start: "top 80%",
-                        toggleActions: "play reverse play reverse",
-                    }
-                });
-            });
-
-            // "What We Bring To The Table" heading
-            const servicesHeading = document.querySelector("#services-intro h2");
-            if (servicesHeading) {
-                gsap.fromTo(servicesHeading, { x: "-100%", opacity: 0 }, {
-                    x: "0%",
-                    opacity: 1,
-                    scrollTrigger: {
-                        trigger: "#services-intro",
-                        start: "top 80%",
-                        end: "bottom 20%",
-                        toggleActions: "play reverse play reverse",
-                    }
-                });
-            }
-            
-            // New tagline section
-            const newTagline = document.querySelector("#new-tagline");
-            if (newTagline) {
-                const newTaglineWords = newTagline.textContent.split(' ');
-                const newTaglineHtml = newTaglineWords.map(word => `<span class="${word.includes('puzzles') || word.includes('thinking') ? 'highlight' : ''}">${word}</span>`).join(' ');
-                newTagline.innerHTML = newTaglineHtml;
-                
-                gsap.from("#new-tagline span", {
-                    y: -50,
-                    opacity: 0,
-                    stagger: 0.1,
-                    scrollTrigger: {
-                        trigger: "#tagline-section",
-                        start: "top 80%",
-                        toggleActions: "play none none reverse"
-                    }
-                });
-            }
-
-            // "Let's Get Started" heading
-            const contactHeading = document.querySelector("#contact .contact-heading");
-            if(contactHeading){
-                gsap.fromTo(contactHeading, { x: -200, opacity: 0 }, {
-                    x: 0,
-                    opacity: 1,
-                    duration: 1,
-                    ease: "bounce.out",
-                    scrollTrigger: {
-                        trigger: "#contact",
-                        start: "top 80%",
-                        toggleActions: "play reverse play reverse",
-                    }
-                });
-            }
-            
-            const contactImage = document.getElementById('contact-image');
-            if (contactImage) {
-                gsap.from(contactImage, {
-                    opacity: 0,
-                    y: 50,
-                    duration: 1,
-                    scrollTrigger: {
-                        trigger: "#contact-image",
-                        start: "top 90%",
-                        toggleActions: "play none none reverse"
-                    }
-                });
-            }
-        }
-
-        function setupHoverAnimations() {
-            const submitBtn = document.querySelector('#contact .btn.filled');
-            if (submitBtn) {
-                submitBtn.addEventListener('mouseenter', (event) => {
-                    gsap.to(event.target, {
-                        scale: 1.1,
-                        z: 50,
-                        boxShadow: "0 10px 30px rgba(26, 255, 255, 0.5)",
-                        duration: 0.3,
-                        ease: "power2.inOut"
-                    });
-                });
-                submitBtn.addEventListener('mouseleave', (event) => {
-                    gsap.to(event.target, {
-                        scale: 1,
-                        z: 0,
-                        boxShadow: "0 4px 15px rgba(0, 168, 232, 0.4)",
-                        duration: 0.3,
-                        ease: "power2.inOut"
-                    });
-                });
-            }
-            document.querySelectorAll('.fullscreen-nav ul li a').forEach(link => {
-                link.addEventListener('mouseenter', () => {
-                    gsap.to(link, { color: 'var(--accent-aqua)', duration: 0.3 });
-                });
-                link.addEventListener('mouseleave', () => {
-                    gsap.to(link, { color: 'var(--text-light)', duration: 0.3 });
-                });
-            });
-        }
-
-        const canvas = document.getElementById('futuristic-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        const repelRadius = 80;
-        const repelStrength = 5;
-
-        class Particle {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.originalX = x;
-                this.originalY = y;
-                this.size = 1.5;
-                this.baseSpeedX = (Math.random() - 0.5) * 0.2;
-                this.baseSpeedY = (Math.random() - 0.5) * 0.2;
-            }
-            update(mouseX, mouseY) {
-                const dx = this.x - mouseX;
-                const dy = this.y - mouseY;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < repelRadius) {
-                    const angle = Math.atan2(dy, dx);
-                    const force = 1 - (distance / repelRadius);
-                    const pushX = Math.cos(angle) * force * repelStrength;
-                    const pushY = Math.sin(angle) * force * repelStrength;
-                    this.x += pushX;
-                    this.y += pushY;
-                } else {
-                    const returnSpeed = 0.05;
-                    this.x += (this.originalX - this.x) * returnSpeed + this.baseSpeedX;
-                    this.y += (this.originalY - this.y) * returnSpeed + this.baseSpeedY;
-                }
-                if (this.x > canvas.width || this.x < 0) this.x = this.x > canvas.width ? 0 : canvas.width;
-                if (this.y > canvas.height || this.y < 0) this.y = this.y > canvas.height ? 0 : canvas.height;
-            }
-            draw() {
-                const gradient = ctx.createRadialGradient(
-                    this.x, this.y, 0,
-                    this.x, this.y, this.size * 2
-                );
-                gradient.addColorStop(0, 'rgba(0, 70, 150, 0.8)');
-                gradient.addColorStop(1, 'rgba(0, 50, 100, 0.4)');
-                
-                ctx.fillStyle = gradient;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-        function initParticles() {
-            particles = [];
-            const dotSize = 15;
-            const cols = Math.floor(canvas.width / dotSize);
-            const rows = Math.floor(canvas.height / dotSize);
-            for (let i = 0; i < rows; i++) {
-                for (let j = 0; j < cols; j++) {
-                    const x = j * dotSize + dotSize / 2;
-                    const y = i * dotSize + dotSize / 2;
-                    particles.push(new Particle(x, y));
-                }
-            }
-        }
-        let mouse = { x: null, y: null };
-        window.addEventListener('mousemove', (event) => {
-            mouse.x = event.x;
-            mouse.y = event.y;
-        });
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].update(mouse.x, mouse.y);
-                particles[i].draw();
-            }
-            requestAnimationFrame(animate);
-        }
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            initParticles();
-        }
-        window.addEventListener('resize', resizeCanvas);
-        window.onload = function() {
-            resizeCanvas();
-            animate();
-            setupPageLoadAnimations();
-            setupScrollAnimations();
-            setupHoverAnimations();
-
-            const navToggle = document.getElementById('nav-toggle');
-            const fullscreenNav = document.getElementById('fullscreen-nav');
-            navToggle.addEventListener('click', () => {
-                fullscreenNav.classList.toggle('active');
-            });
-            document.querySelectorAll('.fullscreen-nav ul li a').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    document.querySelector(this.getAttribute('href')).scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                    fullscreenNav.classList.remove('active');
-                });
-            });
-            var app = document.getElementById('typewriter');
-            if (app) {
-                var typewriter = new Typewriter(app, {
-                    loop: true,
-                    delay: 75,
-                });
-                typewriter
-                    .typeString('Create')
-                    .pauseFor(1000)
-                    .deleteAll()
-                    .typeString('Build')
-                    .pauseFor(1000)
-                    .deleteAll()
-                    .typeString('Dream')
-                    .pauseFor(1000)
-                    .deleteAll()
-                    .typeString('Inspire')
-                    .pauseFor(1000)
-                    .deleteAll()
-                    .typeString('Design')
-                    .pauseFor(1000)
-                    .deleteAll()
-                    .typeString('Transform')
-                    .pauseFor(1000)
-                    .deleteAll()
-                    .typeString('Shape')
-                    .pauseFor(1000)
-                    .deleteAll()
-                    .typeString('Solve')
-                    .pauseFor(1000)
-                    .deleteAll()
-                    .typeString('Dare')
-                    .pauseFor(1000)
-                    .deleteAll()
-                    .typeString('Innovate')
-                    .pauseFor(1000)
-                    .deleteAll()
-                    .typeString('Disrupt')
-                    .pauseFor(1000)
-                    .deleteAll()
-                    .start();
-            }
-        };
-    </script>
-</body>
-</html>
+export default App;
