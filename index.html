@@ -100,13 +100,14 @@ const NeuralNetworkBackground: React.FC = () => {
 	const particlesRef = useRef<Particle[]>([]);
 	const animationFrameRef = useRef<number>();
 
-	const REPULSION_RADIUS = 200; 
-	const REPULSION_FORCE = 0.05; 
+	// CHANGED: Reduced reaction radius and force for extreme minimalism
+	const REPULSION_RADIUS = 20; 
+	const REPULSION_FORCE = 0.001; 
 	const PARTICLE_SPEED_MULTIPLIER = 10; 
 
 	const COLORS = {
-		PARTICLE: '#0EA5E9', 
-		LINE: '#06B6D4', 
+		PARTICLE: '#64748B', // Changed to Slate-500 (Gray)
+		LINE: '#475569', // Changed to Slate-600 (Darker Gray/Thin)
 		BACKGROUND: '#0a0a0f', 
 	};
 
@@ -119,11 +120,12 @@ const NeuralNetworkBackground: React.FC = () => {
 		alpha: number;
 
 		constructor(width: number, height: number) {
+			// Very slow initial velocity
 			this.x = Math.random() * width;
 			this.y = Math.random() * height;
-			this.vx = (Math.random() - 0.5) * 0.5;
-			this.vy = (Math.random() - 0.5) * 0.5;
-			this.radius = 1 + Math.random();
+			this.vx = (Math.random() - 0.5) * 0.05;
+			this.vy = (Math.random() - 0.5) * 0.05;
+			this.radius = 1 + Math.random() * 0.5; // Slightly smaller radius
 			this.alpha = 0.5 + Math.random() * 0.5;
 		}
 
@@ -131,11 +133,13 @@ const NeuralNetworkBackground: React.FC = () => {
 			this.x += this.vx;
 			this.y += this.vy;
 
+			// Wrap around screen edges
 			if (this.x < 0) this.x = width;
 			if (this.x > width) this.x = 0;
 			if (this.y < 0) this.y = height;
 			if (this.y > height) this.y = 0;
 
+			// Mouse repulsion (minimal)
 			const dx = this.x - mouseX;
 			const dy = this.y - mouseY;
 			const dist = Math.sqrt(dx * dx + dy * dy);
@@ -146,10 +150,12 @@ const NeuralNetworkBackground: React.FC = () => {
 				this.x += Math.cos(angle) * force * PARTICLE_SPEED_MULTIPLIER;
 				this.y += Math.sin(angle) * force * PARTICLE_SPEED_MULTIPLIER;
 			} else {
-				this.vx += ( (Math.random() - 0.5) * 0.05 - this.vx) * 0.1;
-				this.vy += ( (Math.random() - 0.5) * 0.05 - this.vy) * 0.1;
+				// Slow return to normal velocity
+				this.vx += ( (Math.random() - 0.5) * 0.01 - this.vx) * 0.1;
+				this.vy += ( (Math.random() - 0.5) * 0.01 - this.vy) * 0.1;
 			}
 
+			// Draw particle
 			ctx.beginPath();
 			ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
 			ctx.fillStyle = COLORS.PARTICLE;
@@ -168,6 +174,7 @@ const NeuralNetworkBackground: React.FC = () => {
 		for (let i = 0; i < particles.length; i++) {
 			particles[i].update(ctx, width, height, mouseX, mouseY);
 			
+			// --- RESTORED: Logic for drawing lines between particles (web effect) ---
 			for (let j = i + 1; j < particles.length; j++) {
 				const p1 = particles[i];
 				const p2 = particles[j];
@@ -176,28 +183,31 @@ const NeuralNetworkBackground: React.FC = () => {
 				const dy = p1.y - p2.y;
 				const dist = Math.sqrt(dx * dx + dy * dy);
 
-				if (dist < 180) { 
+				if (dist < 180) { // Keep line connection distance for coverage
 					ctx.beginPath();
-					ctx.strokeStyle = COLORS.LINE;
-					ctx.globalAlpha = 0.8 * (1 - dist / 180); 
-					ctx.lineWidth = 0.5;
+					ctx.strokeStyle = COLORS.LINE; // Use new gray line color
+					ctx.globalAlpha = 0.4 * (1 - dist / 180); // Reduced max opacity to 0.4 for subtlety
+					ctx.lineWidth = 0.4; // Make lines very thin
 					ctx.moveTo(p1.x, p1.y);
 					ctx.lineTo(p2.x, p2.y);
 					ctx.stroke();
 				}
 			}
+			// --- END RESTORED ---
 		}
+		
+		// --- RESTORED: Line to mouse (also subtle/minimal) ---
 		for (let i = 0; i < particles.length; i++) {
 			const p = particles[i];
 			const dx = p.x - mouseX;
 			const dy = p.y - mouseY;
 			const dist = Math.sqrt(dx * dx + dy * dy);
 
-			if (dist < 150) {
+			if (dist < 100) { // Reduced reaction distance for mouse
 				ctx.beginPath();
 				ctx.strokeStyle = COLORS.LINE;
-				ctx.globalAlpha = 0.9 * (1 - dist / 150);
-				ctx.lineWidth = 1;
+				ctx.globalAlpha = 0.5 * (1 - dist / 100); // Subtle opacity
+				ctx.lineWidth = 0.3;
 				ctx.moveTo(p.x, p.y);
 				ctx.lineTo(mouseX, mouseY);
 				ctx.stroke();
@@ -235,7 +245,6 @@ const NeuralNetworkBackground: React.FC = () => {
 			window.removeEventListener('resize', resize);
 			window.removeEventListener('mousemove', handleMouseMove);
 			if (animationFrameRef.current) {
-				// FIX: Corrected typo from 'animationFrameFrameRef' to 'animationFrameRef'
 				cancelAnimationFrame(animationFrameRef.current);
 			}
 		};
@@ -445,7 +454,6 @@ const HeroSection: React.FC = () => (
                 // Positioning in the top left corner (fixed position)
                 className="fixed top-10 left-6 z-50 inline-flex items-center px-4 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-cyan-400 bg-blue-900/70 backdrop-blur-sm border border-cyan-500/30 shadow-lg"
             >
-                {/* FIX: Corrected missing JSX closing tag and added the Icon component inside the div */}
                 <Zap className="w-4 h-4 mr-2 text-cyan-500" />
                 New: AI Automation Framework
             </motion.div>
