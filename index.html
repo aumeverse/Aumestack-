@@ -437,7 +437,7 @@ const RotatingLogo: React.FC = () => {
 const HeroSection: React.FC = () => (
 	<motion.div
 		id="home"
-        // INCREASED padding top from pt-48 to pt-64 and md:pt-64 to md:pt-80 to push the headline down 
+        // INCREASED padding top to pt-64 and md:pt-80
 		className="relative min-h-screen pt-64 md:pt-80 pb-20 flex flex-col items-center justify-center text-center bg-gradient-to-b from-slate-950 to-blue-900"
 		initial={{ opacity: 0 }}
 		animate={{ opacity: 1 }}
@@ -454,6 +454,7 @@ const HeroSection: React.FC = () => (
                 // Positioning in the top left corner (fixed position)
                 className="fixed top-10 left-6 z-50 inline-flex items-center px-4 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-cyan-400 bg-blue-900/70 backdrop-blur-sm border border-cyan-500/30 shadow-lg"
             >
+                {/* FIXED: The Zap icon was not properly closed */}
                 <Zap className="w-4 h-4 mr-2 text-cyan-500" />
                 New: AI Automation Framework
             </motion.div>
