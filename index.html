@@ -418,7 +418,7 @@
             <h2 class="text-4xl md:text-5xl font-extrabold text-center mb-4 gradient-text-blue font-varela">Our Regular Connectivity Framework</h2>
             <p class="text-center text-xl text-slate-400 mb-16">We don't ghost you. We stay connected, iterate, and ensure results.</p>
             <div class="relative">
-                <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-cyan-500/20"></div>
+                <div class="absolute top-0 left-5 md:left-1/2 transform md:-translate-x-1/2 h-full w-0.5 bg-cyan-500/20"></div>
                 <div id="process-steps-container">
                     <!-- Process steps will be injected here -->
                 </div>
@@ -939,7 +939,7 @@
             processContainer.innerHTML = processSteps.map((step, index) => `
                 <div class="relative flex items-center w-full my-12 scroll-animate" style="transition-delay: ${0.1 * index}s;">
                     <div class="w-full md:w-1/2 ${index % 2 !== 0 ? 'order-last md:ml-auto' : 'md:mr-auto'}">
-                        <div class="tech-card-blue p-5 md:p-8 ${index % 2 !== 0 ? 'md:text-right' : 'md:text-left'}">
+                        <div class="tech-card-blue p-5 md:p-8 ${index % 2 !== 0 ? 'md:text-right' : 'md:text-left'} ml-12 md:ml-0">
                             <div class="flex items-center mb-3 ${index % 2 !== 0 ? 'flex-row-reverse justify-start' : 'justify-start'}">
                                 <div class="w-8 h-8 rounded-full bg-gradient-to-r ${step.color} flex items-center justify-center text-white font-bold ${index % 2 !== 0 ? 'ml-3' : 'mr-3'}">${step.step}</div>
                                 <h3 class="text-xl font-bold text-slate-100 font-varela">${step.title}</h3>
@@ -947,7 +947,7 @@
                             <p class="text-slate-300 text-sm">${step.description}</p>
                         </div>
                     </div>
-                    <div class="absolute left-1/2 transform -translate-x-1/2 z-10">
+                    <div class="absolute left-5 md:left-1/2 transform md:-translate-x-1/2 z-10">
                         <div class="w-10 h-10 rounded-full bg-slate-950 border-4 border-cyan-500 flex items-center justify-center">
                             <i data-lucide="${step.icon}" class="w-5 h-5 text-cyan-500"></i>
                         </div>
@@ -996,6 +996,8 @@
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('is-visible');
+                    } else {
+                        entry.target.classList.remove('is-visible');
                     }
                 });
             }, {
@@ -1101,4 +1103,6 @@ ${message}`.trim();
 
 </body>
 </html>
+
+
 
