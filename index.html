@@ -339,7 +339,7 @@
         <!-- Features Bento Grid -->
         <section id="features" class="relative py-16 md:py-24 max-w-7xl mx-auto px-6 scroll-animate">
             <h2 class="text-4xl md:text-5xl font-extrabold text-center mb-16 gradient-text-blue font-varela">The AUMESTACK Advantage</h2>
-            <div class="grid md:grid-cols-3 gap-6 auto-rows-fr">
+            <div class="grid md:grid-cols-3 gap-6 md:auto-rows-fr">
                 <div class="md:col-span-2 tech-card-blue p-6 md:p-8 flex flex-col h-full bg-gradient-to-br from-blue-900/50 to-slate-900/50">
                     <div class="flex justify-between items-start mb-4">
                         <i data-lucide="clock" class="w-10 h-10 text-cyan-500"></i>
@@ -575,7 +575,7 @@
 		<div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-10 pb-12">
 			<div>
 				<div class="flex items-center text-slate-100 font-bold text-xl mb-3">
-					<img src="https://i.ibb.co/FbzX3729/final-logo-02.png" alt="AUMESTACK Logo" class="w-8 h-8 object-contain mr-2" onerror="handleImageError(this)">
+					<img id="footer-logo" src="https://i.ibb.co/FbzX3729/final-logo-02.png" alt="AUMESTACK Logo" class="w-8 h-8 object-contain mr-2" onerror="handleImageError(this)">
 					<span class="text-xl font-bold">AUMESTACK</span>
 				</div>
 				<p class="text-sm font-semibold text-sky-500 mb-3">AI Automation & Growth Systems</p>
@@ -758,6 +758,7 @@
             // --- 1.1 ROTATING LOGO & FLOATING TEXT ANIMATION ---
             const rotatingLogo = document.getElementById('rotating-logo-container');
             const floatingText = document.getElementById('floating-text-container');
+            const footerLogo = document.getElementById('footer-logo');
 
             if (rotatingLogo) {
                 rotatingLogo.animate([
@@ -778,6 +779,16 @@
                     duration: 4000,
                     iterations: Infinity,
                     easing: 'ease-in-out'
+                });
+            }
+            if (footerLogo) {
+                footerLogo.animate([
+                    { transform: 'rotate(0deg)' },
+                    { transform: 'rotate(360deg)' }
+                ], {
+                    duration: 20000, // A bit faster than the main logo for a subtle effect
+                    iterations: Infinity,
+                    easing: 'linear'
                 });
             }
 
@@ -947,7 +958,7 @@
                             <p class="text-slate-300 text-sm">${step.description}</p>
                         </div>
                     </div>
-                    <div class="absolute left-5 md:left-1/2 transform md:-translate-x-1/2 z-10">
+                    <div class="absolute left-5 md:left-1/2 transform -translate-x-1/2 z-10">
                         <div class="w-10 h-10 rounded-full bg-slate-950 border-4 border-cyan-500 flex items-center justify-center">
                             <i data-lucide="${step.icon}" class="w-5 h-5 text-cyan-500"></i>
                         </div>
@@ -1103,6 +1114,5 @@ ${message}`.trim();
 
 </body>
 </html>
-
 
 
